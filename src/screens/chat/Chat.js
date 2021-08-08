@@ -143,7 +143,7 @@ export default class Chat extends React.Component {
     
   }
   componentDidUpdate(){
-    this.Push()
+    this.Push();
   }
   async _onRefresh() {
     this.setState({ refreshing: true });
