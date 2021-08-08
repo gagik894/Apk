@@ -1,5 +1,9 @@
 {
   "expo": {
+    "userInterfaceStyle": "automatic",
+    "facebookScheme": "fb804105460333300",
+    "facebookAppId": "804105460333300",
+    "facebookDisplayName": "Together",
     "name": "Apk",
     "slug": "Apk",
     "version": "1.0.0",
@@ -17,10 +21,14 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "Together"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "package": "firstApp.apk"
     }
   }
 }
