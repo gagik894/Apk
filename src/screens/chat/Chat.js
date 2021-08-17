@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -14,10 +14,11 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Chatform from "./ChatForm";
-import Pusher from 'pusher-js/react-native';
+import Pusher from "pusher-js/react-native";
+import { NetInfoCellularGeneration } from "@react-native-community/netinfo";
 
 //page 1 single chat
-function Chats(props) { 
+function Chats(props) {
   let UserId;
   if (props.user == props.data.userId._id) {
     UserId = props.data.userId1;
@@ -86,6 +87,7 @@ function Chats(props) {
 export default class Chat extends React.Component {
   state = {
     data: [],
+    newData: null,
     loading: false,
     error: false,
     refreshing: false,
@@ -93,6 +95,61 @@ export default class Chat extends React.Component {
     messageData: null,
     user: null,
     textval: null,
+  };
+
+  Push = () => {
+    const pusher = new Pusher("111c634f224bfb055def", {
+      cluster: "ap2",
+    });
+
+    const channel = pusher.subscribe("messages");
+    // alert(this.state.user)
+    let user = this.state.user;
+    const addNewData = (props) => {
+      let newDataArray = [];
+      if (this.state.newData) {
+        newDataArray = this.state.newData;
+      }
+      newDataArray.push(props);
+      this.setState({
+        newData: newDataArray,
+      });
+    };
+    const refresh = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const fetchedData = await fetch(
+          // "http://localhost:3333/messages",
+          "https://backapi.herokuapp.com/messages",
+          {
+            method: "GET",
+            headers: {
+              "auth-token": token,
+            },
+          }
+        );
+        const data = await fetchedData.json();
+
+        this.setState({
+          data: data.messageData,
+          user: data.user,
+        });
+      } catch (error) {
+        console.log(error, "f");
+        this.setState({ error: true });
+      }
+    };
+
+    channel.bind("new", function (data) {
+      if (user == data.user || user == data.user1) {
+        // alert("true");
+        refresh();
+        addNewData(data);
+      }
+
+      // console.log(JSON.stringify(data));
+      // alert(JSON.stringify(data));
+    });
   };
 
   constructor(props) {
@@ -138,14 +195,12 @@ export default class Chat extends React.Component {
       this.setState({ error: true, loading: false });
     }
   };
-  
-  componentDidMount() {
-    this.fetchData();
-    
-  }
-  componentDidUpdate(){
+
+  async componentDidMount() {
+    await this.fetchData();
     this.Push();
   }
+  componentDidUpdate() {}
   async _onRefresh() {
     this.setState({ refreshing: true });
     await this.fetchData();
@@ -191,16 +246,36 @@ export default class Chat extends React.Component {
           </View>
         ) : (
           <View style={{ flex: 1, justifyContent: "space-between" }}>
-            <ScrollView
-              refreshControl={
-                <RefreshControl
-                  refreshing={this.state.refreshing}
-                  onRefresh={this._onRefresh.bind(this)}
-                />
-              }
-            >
-              {this.state.clicked
-                ? this.state.messageData.message.slice(0).reverse().map((i, index) => {
+            {this.state.clicked ? (
+              <ScrollView
+                style={{ transform: [{ rotate: "180deg" }] }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={this.state.refreshing}
+                    onRefresh={this._onRefresh.bind(this)}
+                  />
+                }
+              >
+                {this.state.newData != [] && this.state.newData
+                  ? this.state.newData
+                      .slice(0)
+                      .reverse()
+                      .map((j, index1) => {
+                        return (
+                          <Chatform
+                            key={index1}
+                            data={j}
+                            userData={this.state.messageData}
+                            user={this.state.user}
+                          />
+                        );
+                        console.log(j, index);
+                      })
+                  : null}
+                {this.state.messageData.message
+                  .slice(0)
+                  .reverse()
+                  .map((i, index) => {
                     return (
                       <Chatform
                         key={index}
@@ -209,8 +284,21 @@ export default class Chat extends React.Component {
                         user={this.state.user}
                       />
                     );
-                  })
-                : this.state.data.slice(0).reverse().map((i, index) => {
+                  })}
+              </ScrollView>
+            ) : (
+              <ScrollView
+                refreshControl={
+                  <RefreshControl
+                    refreshing={this.state.refreshing}
+                    onRefresh={this._onRefresh.bind(this)}
+                  />
+                }
+              >
+                {this.state.data
+                  .slice(0)
+                  .reverse()
+                  .map((i, index) => {
                     return (
                       <Chats
                         key={index}
@@ -220,7 +308,8 @@ export default class Chat extends React.Component {
                       />
                     );
                   })}
-            </ScrollView>
+              </ScrollView>
+            )}
             <View
               style={{ flexDirection: "column", justifyContent: "flex-end" }}
             >
@@ -311,5 +400,5 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     alignItems: "center",
     justifyContent: "flex-start",
-   },
+  },
 });

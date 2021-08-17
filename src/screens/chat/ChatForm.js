@@ -7,9 +7,8 @@ import {
 } from "react-native";
 
 export default function Chatform(props){
-  console.log(props)
   return (
-      <View style={(props.data.user == props.user ? { flexDirection: "row-reverse", marginLeft: "2%" } : { flexDirection: "row" })}>
+      <View style={(props.data.user == props.user ? { flexDirection: "row-reverse", marginLeft: "2%",transform: [{rotate: '180deg'}] } : { flexDirection: "row",transform: [{rotate: '180deg'}] })}>
         {props.data.user == props.user ? null : (
            <View style={styles.left}>
            <Image

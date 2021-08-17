@@ -19,14 +19,6 @@ import Pusher from 'pusher-js/react-native';
 // Enable pusher logging - don't include this in production
 Pusher.logToConsole = true;
 
-// var pusher = new Pusher('111c634f224bfb055def', {
-//   cluster: 'ap2'
-// });
-
-// var channel = pusher.subscribe('messages');
-// channel.bind('inserted', function(data) {
-//   alert(JSON.stringify(data));
-// });
 
 export default function App() {
 
@@ -37,7 +29,11 @@ export default function App() {
     
   //   var channel = pusher.subscribe('messages');
   //   channel.bind('inserted', function(data) {
-  //     alert(JSON.stringify(data));
+  //     console.log(data)
+  //     // if (props.user == data.user) {
+  //     //   console.log(data)
+  //     //   alert("true")
+  //     // }
   //   });
   // }, [])
 
