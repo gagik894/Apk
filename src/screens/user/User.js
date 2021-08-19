@@ -39,7 +39,6 @@ export default class Users extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
-      console.log("apidata", apidata);
       this.setState({ data: apidata, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
@@ -60,13 +59,16 @@ export default class Users extends React.Component {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      console.log("profiledata", profiledata);
       this.setState({ profileData: profiledata, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
       console.log("error", error);
     }
   };
+
+  removeToken = async ()=>{
+    await AsyncStorage.removeItem("token")
+  }
   componentDidMount() {
     this.fetchData();
     this.fetchProfile();
@@ -83,9 +85,10 @@ export default class Users extends React.Component {
         <View style={styles.header}>
           <View style={styles.text}>
             <TouchableOpacity
-              onPress={
-                () => AsyncStorage.removeItem("token"),()=> this.props.navigation.navigate("SignIn",{data: "name"})
-              }
+              onPress={() => {
+                this.removeToken()
+                this.props.navigation.navigate("SignIn", { data: "name" });
+              }}
             >
               <Text style={{ fontSize: 20 }}>
                 {this.state.profileData.username}
@@ -124,7 +127,7 @@ export default class Users extends React.Component {
                           height: "100%",
                           width: "100%",
                           borderRadius: 148 / 2,
-                          backgroundColor: "#eaeded"
+                          backgroundColor: "#eaeded",
                         }}
                         source={{
                           uri: this.state.profileData.avatar,
@@ -182,9 +185,12 @@ export default class Users extends React.Component {
               ) : (
                 <View>
                   <View style={styles.container1}>
-                    {this.state.data.slice(0).reverse().map((i, index) => {
-                      return <Card key={index} data={i} />;
-                    })}
+                    {this.state.data
+                      .slice(0)
+                      .reverse()
+                      .map((i, index) => {
+                        return <Card key={index} data={i} />;
+                      })}
                   </View>
                 </View>
               )}

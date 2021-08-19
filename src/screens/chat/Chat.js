@@ -11,12 +11,14 @@ import {
   RefreshControl,
   FlatList,
   TextInput,
+  BackHandler,
+  Alert
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Chatform from "./ChatForm";
 import Pusher from "pusher-js/react-native";
 import { NetInfoCellularGeneration } from "@react-native-community/netinfo";
-
+import { FontAwesome } from "@expo/vector-icons";
 //page 1 single chat
 function Chats(props) {
   let UserId;
@@ -32,6 +34,7 @@ function Chats(props) {
           props.handler({
             messages: props.data.chat,
             userAvatar: UserId.avatar,
+            otherUser: UserId,
           });
         }}
       >
@@ -95,8 +98,21 @@ export default class Chat extends React.Component {
     messageData: null,
     user: null,
     textval: null,
+    otherUser: null,
   };
 
+  BackBtn = ()=>{
+    const backAction = () => {
+      if (this.state.clicked == true) {
+        this.setState({clicked: false})
+        return true;
+      }   
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }
   Push = () => {
     const pusher = new Pusher("111c634f224bfb055def", {
       cluster: "ap2",
@@ -165,13 +181,44 @@ export default class Chat extends React.Component {
     };
     this.setState({
       clicked: true,
+      otherUser: props.otherUser,
       messageData: messageData,
     });
   }
 
-  fetchData = async () => {
+  fetchMessage = async () => {
+    if (this.state.textval) {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const send = {
+          message: this.state.textval,
+          userId1: this.state.otherUser._id,
+        };
+        this.setState({
+          textval: null,
+        });
+        const fetchedData = await fetch(
+          // "http://localhost:3333/messages/add",
+          "https://backapi.herokuapp.com/messages/add",
+          {
+            method: "POST",
+            headers: {
+              "auth-token": token,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(send),
+          }
+        );
+        const data = await fetchedData.json();
+        console.log(data);
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
+  ref = async () => {
     try {
-      this.setState({ loading: true });
+      console.log("tr");
       const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
         // "http://localhost:3333/messages",
@@ -188,6 +235,31 @@ export default class Chat extends React.Component {
       this.setState({
         data: data.messageData,
         user: data.user,
+        newData: null,
+      });
+    } catch (error) {
+      console.log(error, "f");
+      this.setState({ error: true });
+    }
+  };
+  fetchData = async () => {
+    try {
+      this.setState({ loading: true, newData: null });
+      const token = await AsyncStorage.getItem("token");
+      const fetchedData = await fetch(
+        // "http://localhost:3333/messages",
+        "https://backapi.herokuapp.com/messages",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const data = await fetchedData.json();
+      this.setState({
+        data: data.messageData,
+        user: data.user,
         loading: false,
       });
     } catch (error) {
@@ -199,6 +271,7 @@ export default class Chat extends React.Component {
   async componentDidMount() {
     await this.fetchData();
     this.Push();
+    this.BackBtn();
   }
   componentDidUpdate() {}
   async _onRefresh() {
@@ -212,16 +285,33 @@ export default class Chat extends React.Component {
       <View style={styles.container}>
         <View style={styles.mainheader}>
           {this.state.clicked ? (
-            <View style={styles.title}>
+            <View
+              style={
+                (styles.title, { flexDirection: "row", alignItems: "center" })
+              }
+            >
               <TouchableOpacity
                 onPress={() => {
+                  this.ref();
                   this.setState({
                     clicked: false,
                   });
                 }}
               >
-                <Text>back</Text>
+                <FontAwesome name="arrow-left" size={30} />
               </TouchableOpacity>
+              <View style={{ flex: 1, alignItems: "center" }}>
+                <Text
+                  style={[
+                    {
+                      fontSize: 20,
+                      justifySelf: "center",
+                    },
+                  ]}
+                >
+                  {this.state.otherUser.username}
+                </Text>
+              </View>
             </View>
           ) : (
             <View style={styles.title}>
@@ -260,16 +350,22 @@ export default class Chat extends React.Component {
                   ? this.state.newData
                       .slice(0)
                       .reverse()
-                      .map((j, index1) => {
-                        return (
-                          <Chatform
-                            key={index1}
-                            data={j}
-                            userData={this.state.messageData}
-                            user={this.state.user}
-                          />
-                        );
-                        console.log(j, index);
+                      .map((j, index) => {
+                        if (
+                          (j.user == this.state.user &&
+                            j.user1 == this.state.otherUser._id) ||
+                          (j.user1 == this.state.user &&
+                            j.user == this.state.otherUser._id)
+                        ) {
+                          return (
+                            <Chatform
+                              key={index}
+                              data={j}
+                              userData={this.state.messageData}
+                              user={this.state.user}
+                            />
+                          );
+                        }
                       })
                   : null}
                 {this.state.messageData.message
@@ -322,16 +418,20 @@ export default class Chat extends React.Component {
                         textval: val,
                       });
                     }}
+                    value={this.state.textval}
                     style={{
                       paddingHorizontal: 10,
                       borderRadius: 30,
                       borderWidth: 2,
                       borderColor: "red",
-                      width: "90%",
+                      width: "87%",
                       height: "100%",
                       fontSize: 15,
                     }}
                   />
+                  <TouchableOpacity onPress={() => this.fetchMessage()}>
+                    <FontAwesome name="paper-plane" color="black" size={27} />
+                  </TouchableOpacity>
                 </View>
               ) : null}
             </View>
@@ -396,9 +496,9 @@ const styles = StyleSheet.create({
   text: {
     height: 40,
     flexDirection: "row",
-    paddingHorizontal: 5,
+    paddingHorizontal: 2,
+    justifyContent: "space-around",
     marginVertical: 10,
     alignItems: "center",
-    justifyContent: "flex-start",
   },
 });

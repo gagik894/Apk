@@ -3,6 +3,8 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
+  BackHandler,
+  Alert 
 } from "react-native";
 import Constants from "expo-constants";
 import BottomTabNavigator from "./src/Navigation/BottomTabNavigation";
@@ -23,19 +25,22 @@ Pusher.logToConsole = true;
 export default function App() {
 
   // useEffect(() => {
-  //   var pusher = new Pusher('111c634f224bfb055def', {
-  //     cluster: 'ap2'
-  //   });
-    
-  //   var channel = pusher.subscribe('messages');
-  //   channel.bind('inserted', function(data) {
-  //     console.log(data)
-  //     // if (props.user == data.user) {
-  //     //   console.log(data)
-  //     //   alert("true")
-  //     // }
-  //   });
-  // }, [])
+  //   const backAction = () => {
+  //     Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+  //       {
+  //         text: 'Cancel',
+  //         onPress: () => null,
+  //         style: 'cancel',
+  //       },
+  //       { text: 'YES', onPress: () => BackHandler.exitApp() },
+  //     ]);
+  //     return true;
+  //   };
+
+  //   const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+  //   return () => backHandler.remove();
+  // }, []);
 
 
   const [profile, setprofile] = React.useState(false);

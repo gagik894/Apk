@@ -20,7 +20,7 @@ function UserNavigation(props) {
   return (
     <Stack.Navigator headerMode={"none"}>
       <Stack.Screen name="User" component={User} />
-      <Stack.Screen name="SignIn" component={SignIn} />
+      <Stack.Screen name="SignIn"  component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
     </Stack.Navigator>
   );
@@ -48,18 +48,6 @@ function ChatNavigation(props) {
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator(route) {
-  const [bar, setBar] = useState(true);
-  //   const routeName = getFocusedRouteNameFromRoute(route) ?? 'Feed';
-
-  //   switch (routeName) {
-  //     case 'Feed':
-  //       return 'News feed';
-  //     case 'Profile':
-  //       return 'My profile';
-  //     case 'Account':
-  //       return 'My account';
-  //   }
-  // console.log(routeName)
   return (
     <Tab.Navigator activeColor="#f0edf6">
       <Tab.Screen
@@ -77,7 +65,7 @@ export default function BottomTabNavigator(route) {
       />
       <Tab.Screen
         options={({ route }) => ({
-          tabBarVisible: getScreen(route),
+          tabBarVisible: getScreenChat(route),
           tabBarLabel: "",
           tabBarIcon: () => (
             <Image
@@ -90,7 +78,8 @@ export default function BottomTabNavigator(route) {
         component={Navigation}
       />
       <Tab.Screen
-        options={{
+         options={({ route }) => ({
+          tabBarVisible: getScreen(route),
           tabBarLabel: "",
           tabBarIcon: () => (
             <Image
@@ -98,7 +87,7 @@ export default function BottomTabNavigator(route) {
               source={require("../../assets/img/user.png")}
             />
           ),
-        }}
+        })}
         name="User"
         component={UserNavigation}
       />
@@ -106,18 +95,33 @@ export default function BottomTabNavigator(route) {
   );
 }
 
-function getScreen(route) {
+function getScreenChat(route1) {
   // If the focused route is not found, we need to assume it's the initial screen
   // This can happen during if there hasn't been any navigation inside the screen
   // In our case, it's "Feed" as that's the first screen inside the navigator
-  const routeName = getFocusedRouteNameFromRoute(route) ?? "Cards";
+  const routeName1 = getFocusedRouteNameFromRoute(route1) ?? "Cards";
 
-  switch (routeName) {
+  switch (routeName1) {
     case "Cards":
       return true;
     case "Add":
       return false;
     case "Chat":
+      return false;
+  }
+}
+function getScreen(route) {
+  // If the focused route is not found, we need to assume it's the initial screen
+  // This can happen during if there hasn't been any navigation inside the screen
+  // In our case, it's "Feed" as that's the first screen inside the navigator
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "User";
+
+  switch (routeName) {
+    case "User":
+      return true;
+    case "SignIn":
+      return false;
+    case "SignUp":
       return false;
   }
 }

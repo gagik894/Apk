@@ -18,6 +18,8 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+
 const SignUp = ({ navigation }) => {
   const [error, seterror] = React.useState(null);
   const [signuppage, setsignup] = React.useState(1);
@@ -45,11 +47,50 @@ const SignUp = ({ navigation }) => {
     setkeyboardstatus(false);
   };
 
+  const verifyFetch = async (value) =>{
+    setloading(true);
+    const codeHash = await SecureStore.getItemAsync("secCode")
+    const code = value.code
+    console.log(code, codeHash)
+    const profileData = await SecureStore.getItemAsync("profileData")
+    const sent = {
+      codeHash: codeHash,
+      code: code,
+      profileData: profileData,
+    }
+    try {
+      const verifyedFetch = await fetch(
+        "http://localhost:3333/auth/verify",
+        // "https://backapi.herokuapp.com/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(sent),
+        }
+      );
+      const data = await verifyedFetch.json();
+      setloading(false);
+      if (data.error) {
+        seterror(data.error);
+        return;
+      }
+      await AsyncStorage.setItem("token", data.auth_token);
+      console.log(data.auth_token)
+      navigation.navigate("BottomTabNavigator");
+    } catch (error) {
+      console.log(error);
+      seterror("Something went wrong!!!");
+      setloading(false);
+    }
+  }
   const signUpFetch = async (value) => {
     setloading(true);
     try {
       const fetchSignUp = await fetch(
-          "https://backapi.herokuapp.com/auth/signup",
+        "http://localhost:3333/auth/signup",
+        // "https://backapi.herokuapp.com/auth/signup",
         {
           method: "POST",
           headers: {
@@ -64,10 +105,16 @@ const SignUp = ({ navigation }) => {
         seterror(data.error);
         return;
       }
-      await AsyncStorage.setItem("token", data.auth_token);
-      console.log(data.auth_token);
-      navigation.navigate("BottomTabNavigator");
+      const profileData = JSON.stringify(data.data);
+      await SecureStore.setItemAsync("profileData", profileData);
+      await SecureStore.setItemAsync("secCode", data.secCode);
+      const testItem = await SecureStore.getItemAsync("secCode");
+      // await AsyncStorage.setItem("token", data.auth_token);
+      setsignup(4);
+      console.log(testItem);
+      // navigation.navigate("BottomTabNavigator");
     } catch (error) {
+      console.log(error);
       seterror("Something went wrong!!!");
       setloading(false);
     }
@@ -77,7 +124,7 @@ const SignUp = ({ navigation }) => {
 
     try {
       const fetchSignUpTest = await fetch(
-          "https://backapi.herokuapp.com/auth/signup/test",
+        "https://backapi.herokuapp.com/auth/signup/test",
         {
           method: "POST",
           headers: {
@@ -122,6 +169,16 @@ const SignUp = ({ navigation }) => {
         username: Yup.string(),
         repeatPassword: Yup.string(),
       }))
+    : signuppage == 3
+    ? (validation = Yup.object().shape({
+        email: Yup.string()
+          .email("Must be a valid email ardess")
+          .max(30, "Must be shorter than 30"),
+        password: Yup.string().min(6, "Must be more than 6"),
+        fullname: Yup.string(),
+        username: Yup.string().required("required"),
+        repeatPassword: Yup.string().required("required"),
+      }))
     : (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
@@ -130,6 +187,10 @@ const SignUp = ({ navigation }) => {
         fullname: Yup.string(),
         username: Yup.string().required("required"),
         repeatPassword: Yup.string().required("required"),
+        code: Yup.string()
+          .required("required")
+          .min(6, "Must be 6 digit")
+          .max(6, "Must be 6 digit"),
       }));
 
   return (
@@ -140,13 +201,18 @@ const SignUp = ({ navigation }) => {
         email: "",
         password: "",
         repeatPassword: "",
+        code: "",
       }}
       validationSchema={validation}
       onSubmit={(values, { setSubmitting }) => {
         setSubmitting(true);
 
         {
-          signuppage != 1 ? signUpFetch(values) : signUpFetchTest(values);
+          signuppage == 1
+            ? signUpFetchTest(values)
+            : signuppage == 3
+            ? signUpFetch(values)
+            : verifyFetch(values);
         }
         setSubmitting(false);
       }}
@@ -181,29 +247,24 @@ const SignUp = ({ navigation }) => {
                     </Text>
                   ) : signuppage == 2 ? (
                     <Text style={styles.text_header}>Enter your Full name</Text>
-                  ) : (
+                  ) : signuppage == 3 ? (
                     <Text style={styles.text_header}>
                       Enter your new username & password
+                    </Text>
+                  ) : (
+                    <Text style={styles.text_header}>
+                      Enter the code we sent to your E-mail
                     </Text>
                   )}
                 </View>
               </Animatable.View>
               <Animatable.View
-                style={
-                  keyboardstatus
-                    ? {
-                        flex: 5,
-                        backgroundColor: "#fff",
-                        borderTopLeftRadius: 15,
-                        borderTopRightRadius: 15,
-                      }
-                    : {
-                        flex: 3,
-                        backgroundColor: "#fff",
-                        borderTopLeftRadius: 30,
-                        borderTopRightRadius: 30,
-                      }
-                }
+                style={{
+                  flex: 3,
+                  backgroundColor: "#fff",
+                  borderTopLeftRadius: 30,
+                  borderTopRightRadius: 30,
+                }}
                 animation="fadeInUpBig"
               >
                 <KeyboardAwareScrollView
@@ -242,7 +303,7 @@ const SignUp = ({ navigation }) => {
                               />
                             </View>
                           </View>
-                        ) : (
+                        ) : signuppage == 3 ? (
                           <View>
                             <View style={styles.action}>
                               <TextInput
@@ -299,6 +360,20 @@ const SignUp = ({ navigation }) => {
                               error={errors.repeatPassword}
                             />
                           </View>
+                        ) : (
+                          <View>
+                            <View style={styles.action}>
+                              <TextInput
+                                onChangeText={handleChange("code")}
+                                onBlur={handleBlur("code")}
+                                placeholder="6 digit code"
+                                placeholderTextColor="#666666"
+                                style={styles.textInput}
+                                value={values.code}
+                              />
+                            </View>
+                            <Error touch={touched.code} error={errors.code} />
+                          </View>
                         )}
                         {signuppage == 1 ? (
                           <View>
@@ -352,7 +427,7 @@ const SignUp = ({ navigation }) => {
                               </View>
                             </TouchableOpacity>
                           </View>
-                        ) : (
+                        ) : signuppage == 3?(
                           <View>
                             <TouchableOpacity
                               style={styles.signIn}
@@ -370,13 +445,35 @@ const SignUp = ({ navigation }) => {
                                       },
                                     ]}
                                   >
-                                    Register & Login
+                                    Next
                                   </Text>
                                 )}
                               </View>
                             </TouchableOpacity>
                           </View>
-                        )}
+                        ) : (<View>
+                          <TouchableOpacity
+                            style={styles.signIn}
+                            onPress={handleSubmit}
+                          >
+                            <View>
+                              {loading ? (
+                                <ActivityIndicator color="#fff" />
+                              ) : (
+                                <Text
+                                  style={[
+                                    styles.textSign,
+                                    {
+                                      color: "#fff",
+                                    },
+                                  ]}
+                                >
+                                  Register and Login
+                                </Text>
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                        </View>)}
                       </View>
                       <View style={styles.button}>
                         <View style={styles.forgot}></View>
