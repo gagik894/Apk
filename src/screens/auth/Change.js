@@ -119,8 +119,8 @@ const SignUp = ({ navigation }) => {
 
     try {
       const fetchSignUpTest = await fetch(
-        "http://localhost:3333/auth/passwordchange/email",
-        // "https://backapi.herokuapp.com/auth/signup/test",
+        // "http://localhost:3333/auth/passwordchange/email",
+        "https://backapi.herokuapp.com/auth/passwordchange/email",
         {
           method: "POST",
           headers: {
