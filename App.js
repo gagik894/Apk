@@ -12,6 +12,7 @@ import Navigation from "./src/Navigation/Navigation";
 
 import { NavigationContainer } from "@react-navigation/native";
 import Add from "./src/screens/add/Add";
+import Change from "./src/screens/auth/Change";
 import ChatForm from './src/screens/chat/Chat'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from 'expo-status-bar';
@@ -75,6 +76,7 @@ export default function App() {
       )}
       {/* <ChatForm /> */}
       {/* <Add/> */}
+      {/* <Change/> */}
     </SafeAreaView>
   );
 }

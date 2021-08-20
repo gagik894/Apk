@@ -287,7 +287,7 @@ const SignIn = ({ navigation }, props) => {
                       >
                         Forgot your password?
                       </Text>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={() => navigation.navigate("Change")}>
                         <Text
                           style={[
                             {

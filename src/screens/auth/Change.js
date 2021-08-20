@@ -49,18 +49,18 @@ const SignUp = ({ navigation }) => {
 
   const verifyFetch = async (value) =>{
     setloading(true);
+    console.log("tr")
     const codeHash = await SecureStore.getItemAsync("secCode")
     const code = value.code
-    const profileData = await SecureStore.getItemAsync("profileData")
     const sent = {
       codeHash: codeHash,
       code: code,
-      profileData: profileData,
     }
+    console.log(sent)
     try {
       const verifyedFetch = await fetch(
-        // "http://localhost:3333/auth/verify",
-        "https://backapi.herokuapp.com/auth/verify",
+        // "http://localhost:3333/auth/passwordchange/verify",
+        "https://backapi.herokuapp.com/auth/passwordchange/verify",
         {
           method: "POST",
           headers: {
@@ -73,13 +73,11 @@ const SignUp = ({ navigation }) => {
       setloading(false);
       if (data.error) {
         seterror(data.error);
-        return;
+        return
       }
-      await AsyncStorage.setItem("token", data.auth_token);
-      console.log(data.auth_token)
       await SecureStore.deleteItemAsync("secCode");
-      await SecureStore.deleteItemAsync("profileData")
-      navigation.navigate("BottomTabNavigator");
+      setsignup(3);
+      seterror(null);
     } catch (error) {
       console.log(error);
       seterror("Something went wrong!!!");
@@ -90,8 +88,8 @@ const SignUp = ({ navigation }) => {
     setloading(true);
     try {
       const fetchSignUp = await fetch(
-        // "http://localhost:3333/auth/signup",
-        "https://backapi.herokuapp.com/auth/signup",
+        // "http://localhost:3333/auth/passwordchange",
+        "https://backapi.herokuapp.com/auth/passwordchange",
         {
           method: "POST",
           headers: {
@@ -105,15 +103,10 @@ const SignUp = ({ navigation }) => {
       if (data.error) {
         seterror(data.error);
         return;
-      }
-      const profileData = JSON.stringify(data.data);
-      await SecureStore.setItemAsync("profileData", profileData);
-      await SecureStore.setItemAsync("secCode", data.secCode);
-      const testItem = await SecureStore.getItemAsync("secCode");
-      // await AsyncStorage.setItem("token", data.auth_token);
-      setsignup(4);
-      seterror(false)
-      console.log(testItem);
+      };
+      console.log(data);
+      alert("Password sucscesfully changed")
+      navigation.navigate("SignIn")
       // navigation.navigate("BottomTabNavigator");
     } catch (error) {
       console.log(error);
@@ -126,8 +119,8 @@ const SignUp = ({ navigation }) => {
 
     try {
       const fetchSignUpTest = await fetch(
-        // "http://localhost:3333/auth/signup/test",
-        "https://backapi.herokuapp.com/auth/signup/test",
+        "http://localhost:3333/auth/passwordchange/email",
+        // "https://backapi.herokuapp.com/auth/signup/test",
         {
           method: "POST",
           headers: {
@@ -137,14 +130,17 @@ const SignUp = ({ navigation }) => {
         }
       );
       const data = await fetchSignUpTest.json();
-      setloading(false);
-      if (data.email == value.email) {
-        setsignup(2);
-        seterror(null);
-      }
       if (data.error) {
         seterror(data.error);
+        setloading(false)
+        return;
       }
+      setloading(false);
+        setsignup(4);
+        console.log(data.secCode)
+        SecureStore.setItemAsync("secCode", data.secCode)
+        seterror(null);
+      
     } catch (error) {
       seterror("Something went wrong!!!");
       setloading(false);
@@ -177,9 +173,9 @@ const SignUp = ({ navigation }) => {
         email: Yup.string()
           .email("Must be a valid email ardess")
           .max(30, "Must be shorter than 30"),
-        password: Yup.string().min(6, "Must be more than 6"),
+        password: Yup.string().min(6, "Must be more than 6").required("required"),
         fullname: Yup.string(),
-        username: Yup.string().required("required"),
+        username: Yup.string(),
         repeatPassword: Yup.string().required("required"),
       }))
     : (validation = Yup.object().shape({
@@ -188,8 +184,8 @@ const SignUp = ({ navigation }) => {
           .max(30, "Must be shorter than 30"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string(),
-        username: Yup.string().required("required"),
-        repeatPassword: Yup.string().required("required"),
+        username: Yup.string(),
+        repeatPassword: Yup.string(),
         code: Yup.string()
           .required("required")
           .min(6, "Must be 6 digit")
@@ -252,7 +248,7 @@ const SignUp = ({ navigation }) => {
                     <Text style={styles.text_header}>Enter your Full name</Text>
                   ) : signuppage == 3 ? (
                     <Text style={styles.text_header}>
-                      Enter your new username & password
+                      Enter your new password
                     </Text>
                   ) : (
                     <Text style={styles.text_header}>
@@ -308,20 +304,6 @@ const SignUp = ({ navigation }) => {
                           </View>
                         ) : signuppage == 3 ? (
                           <View>
-                            <View style={styles.action}>
-                              <TextInput
-                                onChangeText={handleChange("username")}
-                                onBlur={handleBlur("username")}
-                                placeholder="New username"
-                                placeholderTextColor="#666666"
-                                style={styles.textInput}
-                                value={values.username}
-                              />
-                            </View>
-                            <Error
-                              touch={touched.username}
-                              error={errors.username}
-                            />
                             <View style={styles.action}>
                               <TextInput
                                 onChangeText={handleChange("password")}

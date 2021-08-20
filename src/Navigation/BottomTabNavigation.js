@@ -12,6 +12,7 @@ import SignIn from "../screens/auth/SignIn";
 import SignUp from "../screens/auth/SignUp";
 import Chat from "../screens/chat/Chat";
 import ChatForm from "../screens/chat/ChatForm";
+import Change from "../screens/auth/Change"
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
@@ -22,6 +23,8 @@ function UserNavigation(props) {
       <Stack.Screen name="User" component={User} />
       <Stack.Screen name="SignIn"  component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="Change" component={Change} />
+      <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator}/>
     </Stack.Navigator>
   );
 }
@@ -122,6 +125,8 @@ function getScreen(route) {
     case "SignIn":
       return false;
     case "SignUp":
+      return false;
+    case "Change":
       return false;
   }
 }
