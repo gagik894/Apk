@@ -52,6 +52,7 @@ const SignIn = ({ navigation }, props) => {
     console.log("signup");
     try {
       const fetchedSignUp = await fetch(
+        // "http://localhost:3333/auth/fbsignup",
         "https://backapi.herokuapp.com/auth/fbsignup",
         {
           method: "POST",
@@ -66,7 +67,9 @@ const SignIn = ({ navigation }, props) => {
       if (data.error) {
         seterror(data.error);
       } else {
+        console.log(data.auth_token);
         await AsyncStorage.setItem("token", data.auth_token);
+        navigation.navigate("BottomTabNavigator");
       }
     } catch (error) {
       console.log(error);
@@ -105,11 +108,11 @@ const SignIn = ({ navigation }, props) => {
       await Facebook.initializeAsync("804105460333300");
       const { type, token, expires, permissions, declinedPermissions } =
         await Facebook.logInWithReadPermissionsAsync({
-          permissions: ["public_profile, user_likes, user_friends"],
+          permissions: ["public_profile"],
         });
       if (type === "success") {
         const response = await fetch(
-          `https://graph.facebook.com/me?access_token=${token}&fields=id,name,friends,email,picture.height(200),likes,birthday`
+          `https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,picture.height(200)`
         );
         const data = await response.json();
         console.log(data);
@@ -153,7 +156,7 @@ const SignIn = ({ navigation }, props) => {
       }) => {
         return (
           <View style={styles.container}>
-            <StatusBar backgroundColor="#009387" barStyle="light-content" />
+            <StatusBar backgroundColor="#45b6ed" barStyle="light-content" />
             <Animatable.View
               animation="slideInDown"
               style={
@@ -224,6 +227,10 @@ const SignIn = ({ navigation }, props) => {
                   <View style={styles.header1}>
                     <View style={styles.action}>
                       <TextInput
+
+                        autoCapitalize="none"
+                        autoCompleteType="email"
+                        keyboardType="email-address"
                         onChangeText={handleChange("email")}
                         onBlur={handleBlur("email")}
                         placeholder="Email or userrname"
@@ -236,6 +243,9 @@ const SignIn = ({ navigation }, props) => {
 
                     <View style={styles.action}>
                       <TextInput
+                        autoCapitalize="none"
+                        autoCompleteType="password"
+                        keyboardType={hiden ? null : "visible-password"}
                         onChangeText={handleChange("password")}
                         onBlur={handleBlur("password")}
                         placeholder="Password"
@@ -287,7 +297,9 @@ const SignIn = ({ navigation }, props) => {
                       >
                         Forgot your password?
                       </Text>
-                      <TouchableOpacity onPress={() => navigation.navigate("Change")}>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("Change")}
+                      >
                         <Text
                           style={[
                             {

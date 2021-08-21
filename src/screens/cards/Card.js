@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Card(props) {
   const [liked, setlike] = useState(false);
   const [disliked, setdislike] = useState(false);
-
+  console.log(props.data.userId.username)
   async function fetchLike(value) {
     const send = { "like": value }
     try {
@@ -34,7 +34,7 @@ export default function Card(props) {
         <View style={styles.profile}>
           <Image
             source={{
-              uri: props.data.userId.avatar,
+              uri: "https://ucanr.edu/sb3/display_2018/images/default-user.png",
             }}
             style={{
               width: "85%",

@@ -227,7 +227,7 @@ const SignUp = ({ navigation }) => {
         return (
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-              <StatusBar backgroundColor="#009387" barStyle="light-content" />
+              <StatusBar backgroundColor="#0095f6" barStyle="light-content" />
               <Animatable.View
                 animation="slideInDown"
                 style={{

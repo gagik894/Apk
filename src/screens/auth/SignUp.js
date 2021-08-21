@@ -47,16 +47,16 @@ const SignUp = ({ navigation }) => {
     setkeyboardstatus(false);
   };
 
-  const verifyFetch = async (value) =>{
+  const verifyFetch = async (value) => {
     setloading(true);
-    const codeHash = await SecureStore.getItemAsync("secCode")
-    const code = value.code
-    const profileData = await SecureStore.getItemAsync("profileData")
+    const codeHash = await SecureStore.getItemAsync("secCode");
+    const code = value.code;
+    const profileData = await SecureStore.getItemAsync("profileData");
     const sent = {
       codeHash: codeHash,
       code: code,
       profileData: profileData,
-    }
+    };
     try {
       const verifyedFetch = await fetch(
         // "http://localhost:3333/auth/verify",
@@ -76,16 +76,16 @@ const SignUp = ({ navigation }) => {
         return;
       }
       await AsyncStorage.setItem("token", data.auth_token);
-      console.log(data.auth_token)
+      console.log(data.auth_token);
       await SecureStore.deleteItemAsync("secCode");
-      await SecureStore.deleteItemAsync("profileData")
+      await SecureStore.deleteItemAsync("profileData");
       navigation.navigate("BottomTabNavigator");
     } catch (error) {
       console.log(error);
       seterror("Something went wrong!!!");
       setloading(false);
     }
-  }
+  };
   const signUpFetch = async (value) => {
     setloading(true);
     try {
@@ -112,7 +112,7 @@ const SignUp = ({ navigation }) => {
       const testItem = await SecureStore.getItemAsync("secCode");
       // await AsyncStorage.setItem("token", data.auth_token);
       setsignup(4);
-      seterror(false)
+      seterror(false);
       console.log(testItem);
       // navigation.navigate("BottomTabNavigator");
     } catch (error) {
@@ -229,9 +229,8 @@ const SignUp = ({ navigation }) => {
         handleSubmit,
       }) => {
         return (
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-              <StatusBar backgroundColor="#009387" barStyle="light-content" />
+              <StatusBar backgroundColor="#0095f6" barStyle="light-content" />
               <Animatable.View
                 animation="slideInDown"
                 style={{
@@ -283,6 +282,9 @@ const SignUp = ({ navigation }) => {
                           <View>
                             <View style={styles.action}>
                               <TextInput
+                                autoCapitalize="none"
+                                autoCompleteType="email"
+                                keyboardType="email-address"
                                 onChangeText={handleChange("email")}
                                 onBlur={handleBlur("email")}
                                 placeholder="Valide email adress"
@@ -297,6 +299,9 @@ const SignUp = ({ navigation }) => {
                           <View>
                             <View style={styles.action}>
                               <TextInput
+                                autoCapitalize="words"
+                                autoCompleteType="name"
+                                keyboardType="default"
                                 onChangeText={handleChange("fullname")}
                                 onBlur={handleBlur("fullname")}
                                 placeholder="full name"
@@ -310,6 +315,9 @@ const SignUp = ({ navigation }) => {
                           <View>
                             <View style={styles.action}>
                               <TextInput
+                                autoCapitalize="none"
+                                autoCompleteType="username"
+                                keyboardType="default"
                                 onChangeText={handleChange("username")}
                                 onBlur={handleBlur("username")}
                                 placeholder="New username"
@@ -324,6 +332,9 @@ const SignUp = ({ navigation }) => {
                             />
                             <View style={styles.action}>
                               <TextInput
+                                autoCapitalize="none"
+                                autoCompleteType="password"
+                                keyboardType={hiden ? null : "visible-password"}
                                 onChangeText={handleChange("password")}
                                 onBlur={handleBlur("password")}
                                 placeholder="New password"
@@ -348,6 +359,9 @@ const SignUp = ({ navigation }) => {
                             />
                             <View style={styles.action}>
                               <TextInput
+                                autoCapitalize="none"
+                                autoCompleteType="password"
+                                keyboardType={hiden ? null : "visible-password"}
                                 onChangeText={handleChange("repeatPassword")}
                                 onBlur={handleBlur("repeatPassword")}
                                 placeholder="Repeat password"
@@ -367,6 +381,9 @@ const SignUp = ({ navigation }) => {
                           <View>
                             <View style={styles.action}>
                               <TextInput
+                                autoCapitalize="none"
+                                autoCompleteType="tel"
+                                keyboardType="numeric"
                                 onChangeText={handleChange("code")}
                                 onBlur={handleBlur("code")}
                                 placeholder="6 digit code"
@@ -430,7 +447,7 @@ const SignUp = ({ navigation }) => {
                               </View>
                             </TouchableOpacity>
                           </View>
-                        ) : signuppage == 3?(
+                        ) : signuppage == 3 ? (
                           <View>
                             <TouchableOpacity
                               style={styles.signIn}
@@ -454,29 +471,31 @@ const SignUp = ({ navigation }) => {
                               </View>
                             </TouchableOpacity>
                           </View>
-                        ) : (<View>
-                          <TouchableOpacity
-                            style={styles.signIn}
-                            onPress={handleSubmit}
-                          >
-                            <View>
-                              {loading ? (
-                                <ActivityIndicator color="#fff" />
-                              ) : (
-                                <Text
-                                  style={[
-                                    styles.textSign,
-                                    {
-                                      color: "#fff",
-                                    },
-                                  ]}
-                                >
-                                  Register and Login
-                                </Text>
-                              )}
-                            </View>
-                          </TouchableOpacity>
-                        </View>)}
+                        ) : (
+                          <View>
+                            <TouchableOpacity
+                              style={styles.signIn}
+                              onPress={handleSubmit}
+                            >
+                              <View>
+                                {loading ? (
+                                  <ActivityIndicator color="#fff" />
+                                ) : (
+                                  <Text
+                                    style={[
+                                      styles.textSign,
+                                      {
+                                        color: "#fff",
+                                      },
+                                    ]}
+                                  >
+                                    Register and Login
+                                  </Text>
+                                )}
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        )}
                       </View>
                       <View style={styles.button}>
                         <View style={styles.forgot}></View>
@@ -512,7 +531,6 @@ const SignUp = ({ navigation }) => {
                 </KeyboardAwareScrollView>
               </Animatable.View>
             </View>
-          </TouchableWithoutFeedback>
         );
       }}
     </Formik>

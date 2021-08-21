@@ -12,7 +12,7 @@ import SignIn from "../screens/auth/SignIn";
 import SignUp from "../screens/auth/SignUp";
 import Chat from "../screens/chat/Chat";
 import ChatForm from "../screens/chat/ChatForm";
-import Change from "../screens/auth/Change"
+import Change from "../screens/auth/Change";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
@@ -21,10 +21,10 @@ function UserNavigation(props) {
   return (
     <Stack.Navigator headerMode={"none"}>
       <Stack.Screen name="User" component={User} />
-      <Stack.Screen name="SignIn"  component={SignIn} />
+      <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="Change" component={Change} />
-      <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator}/>
+      <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
     </Stack.Navigator>
   );
 }
@@ -81,7 +81,7 @@ export default function BottomTabNavigator(route) {
         component={Navigation}
       />
       <Tab.Screen
-         options={({ route }) => ({
+        options={({ route }) => ({
           tabBarVisible: getScreen(route),
           tabBarLabel: "",
           tabBarIcon: () => (
@@ -127,6 +127,8 @@ function getScreen(route) {
     case "SignUp":
       return false;
     case "Change":
+      return false;
+    case "BottomTabNavigator":
       return false;
   }
 }
