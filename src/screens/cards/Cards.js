@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Card from "./Card";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const renderItem = ({ item }) => {
   return <Card data={item} />;
 };
@@ -23,16 +23,31 @@ export default class Cards extends React.Component {
     error: false,
     page: 1,
     refreshing: false,
+    user: null,
   };
 
   fetchData = async () => {
     try {
       this.setState({ loading: true });
-      const fetchedData = await fetch("https://backapi.herokuapp.com/posts");
+      const token = await AsyncStorage.getItem("token");
+      const fetchedData = await fetch(
+        // "http://localhost:3333/posts",
+        "https://backapi.herokuapp.com/posts",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
       const apidata = await fetchedData.json();
-      this.setState({ data: apidata, loading: false });
+      apidata.data.map((i,index) =>{
+        i.user = apidata.User
+      })
+      this.setState({ data: apidata.data, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
+      console.log(error);
     }
   };
 
@@ -50,7 +65,7 @@ export default class Cards extends React.Component {
         <View style={styles.mainheader}>
           <View style={styles.headerItems}>
             <TouchableOpacity
-               onPress={() => this.props.navigation.navigate("Add")}
+              onPress={() => this.props.navigation.navigate("Add")}
             >
               <Image
                 source={require("../../../assets/img/camera.png")}
@@ -94,7 +109,7 @@ export default class Cards extends React.Component {
           </View>
         ) : (
           <FlatList
-          style={{flexDirection: "column"}}
+            style={{ flexDirection: "column" }}
             refreshControl={
               <RefreshControl
                 refreshing={this.state.refreshing}
@@ -102,8 +117,9 @@ export default class Cards extends React.Component {
               />
             }
             data={this.state.data.slice(0).reverse()}
+            userData={this.state.user}
             renderItem={renderItem}
-            keyExtractor={(data) => this.state._id}
+            keyExtractor={(item, index) => item._id}
           />
         )}
       </View>

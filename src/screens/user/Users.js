@@ -38,8 +38,10 @@ export default class Users extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
-      console.log("apidata", apidata);
-      this.setState({ data: apidata, loading: false });
+      apidata.data.map((i,index) =>{
+        i.user = apidata.User
+      })
+      this.setState({ data: apidata.data, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
       console.log("error", error);

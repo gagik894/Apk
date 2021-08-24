@@ -9,7 +9,7 @@ import {
 import Constants from "expo-constants";
 import BottomTabNavigator from "./src/Navigation/BottomTabNavigation";
 import Navigation from "./src/Navigation/Navigation";
-
+import Test from "./src/screens/test/test"
 import { NavigationContainer } from "@react-navigation/native";
 import Add from "./src/screens/add/Add";
 import Change from "./src/screens/auth/Change";
@@ -74,6 +74,7 @@ export default function App() {
       ) : (
         <Navigation />
       )}
+      {/* <Test/> */}
       {/* <ChatForm /> */}
       {/* <Add/> */}
       {/* <Change/> */}

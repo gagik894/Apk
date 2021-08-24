@@ -1,14 +1,45 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Text, Dimensions, Image } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BottomSheet } from "react-native-btr";
 
-export default function Card(props) {
+export default function Card(props, user) {
   const [liked, setlike] = useState(false);
   const [disliked, setdislike] = useState(false);
-  console.log(props.data.userId.username)
+  const [visible, setVisible] = useState(false);
+  const toggleBottomNavigationView = () => {
+    //Toggling the visibility state of the bottom sheet
+    setVisible(!visible);
+  };
+  async function fetchDelete(value) {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const fetchedDelet = await fetch(
+        // `https://backapi.herokuapp.com/posts/post/${props.data._id}/delete`,
+        `http://localhost:3333/posts/post/${props.data._id}/delete`,
+        {
+          method: "delete",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const data = await fetchedDelet.json();
+      toggleBottomNavigationView();
+    } catch (error) {
+      console.log(error);
+      toggleBottomNavigationView();
+    }
+  }
   async function fetchLike(value) {
-    const send = { "like": value }
+    const send = { like: value };
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedLogin = await fetch(
@@ -34,14 +65,14 @@ export default function Card(props) {
         <View style={styles.profile}>
           <Image
             source={{
-              uri: "https://ucanr.edu/sb3/display_2018/images/default-user.png",
+              uri: props.data.userId.avatar,
             }}
             style={{
               width: "85%",
               height: "85%",
               borderRadius: 15,
               alignSelf: "center",
-              backgroundColor: "#eaeded"
+              backgroundColor: "#eaeded",
             }}
           />
         </View>
@@ -49,7 +80,7 @@ export default function Card(props) {
           <Text style={{ fontSize: 15 }}>{props.data.userId.username}</Text>
         </View>
         <View style={styles.more}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={toggleBottomNavigationView}>
             <Image
               source={require("../../../assets/img/more.png")}
               style={{ width: 30, height: 30, alignSelf: "center" }}
@@ -141,6 +172,54 @@ export default function Card(props) {
         <Text style={{ fontSize: 11 }}>{props.data.desc}</Text>
         <Text style={{ fontSize: 11 }}>{props.data.date.substring(0, 10)}</Text>
       </View>
+      <BottomSheet
+        visible={visible}
+        //setting the visibility state of the bottom shee
+        onBackButtonPress={toggleBottomNavigationView}
+        //Toggling the visibility state on the click of the back botton
+        onBackdropPress={toggleBottomNavigationView}
+        //Toggling the visibility state on the clicking out side of the sheet
+      >
+        {/*Bottom Sheet inner View*/}
+        <View style={styles.bottomNavigationView}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "column",
+              justifyContent: "space-around",
+              width: "100%",
+            }}
+          >
+            <TouchableOpacity
+              style={styles.bottomNavigationViewButton}
+              disabled={!(props.data.user == props.data.userId._id)}
+              onPress={() => fetchDelete()}
+            >
+              <Text
+                style={
+                  props.data.user == props.data.userId._id
+                    ? { fontSize: 18, color: "red" }
+                    : { fontSize: 18, color: "#c7c7c7" }
+                }
+              >
+                Delete
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.bottomNavigationViewButton}
+              onPress={() => alert("soon")}
+            >
+              <Text style={{ fontSize: 18 }}>Share</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.bottomNavigationViewButton}
+              onPress={() => toggleBottomNavigationView()}
+            >
+              <Text style={{ fontSize: 18 }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 }
@@ -227,5 +306,20 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "grey",
+  },
+  bottomNavigationView: {
+    backgroundColor: "#fff",
+    width: "100%",
+    height: 204,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bottomNavigationViewButton: {
+    width: "100%",
+    justifyContent: "center",
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+    paddingHorizontal: 20,
+    height: 68,
   },
 });

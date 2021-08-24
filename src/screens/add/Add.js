@@ -6,6 +6,8 @@ import {
   Platform,
   TouchableOpacity,
   Text,
+  ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
@@ -14,9 +16,10 @@ const FormData = require("form-data");
 
 export default function ImagePickerExample() {
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fetchAdd = async (props) => {
-    console.log("000");
     try {
+      setLoading(true);
       let formdata = new FormData();
       formdata.append("image", {
         uri: props,
@@ -37,11 +40,36 @@ export default function ImagePickerExample() {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      console.log("resp", profiledata);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log("erroor", error);
     }
   };
+
+  const openCamera = async () => {
+    // Ask the user for the permission to access the camera
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("You've refused to allow this appp to access your camera!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    // Explore the result
+
+    if (!result.cancelled) {
+      fetchAdd(result.uri)
+    }
+  };
+
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
@@ -63,30 +91,43 @@ export default function ImagePickerExample() {
     });
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      fetchAdd(result.uri)
     }
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
-      <TouchableOpacity onPress={() => fetchAdd(image)}>
-        <View
-          style={{
-            backgroundColor: "blue",
-            width: 70,
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text>Sent</Text>
-        </View>
-      </TouchableOpacity>
+    <View style={styles.screen}>
+       <View style={styles.buttonContainer}>
+        <Button onPress={pickImage} title="Select an image" />
+        <Button onPress={openCamera} title="Open camera" />
+      </View>
+      {/* <Button title="Pick an image from camera roll" onPress={pickImage} /> */}
+          {loading ? <ActivityIndicator color="black" size="large" /> : null}
       {/* <Button title="Sent" onPress={() => fetchAdd(image)} /> */}
-      {image && (
+      {/* {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-      )}
+      )} */}
     </View>
   );
 }
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonContainer: {
+    width: 400,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 10,
+  },
+  imageContainer: {
+    padding: 30,
+  },
+  image: {
+    width: 400,
+    height: 300,
+    resizeMode: "cover",
+  },
+});

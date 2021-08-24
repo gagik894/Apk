@@ -9,12 +9,12 @@ import {
   RefreshControl,
   FlatList,
 } from "react-native";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import MiniCard from "../cards/MiniCard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const renderItem = ({ item }) => {
-  return <MiniCard data={item}/>;
+  return <MiniCard data={item} />;
 };
-
 
 function Header() {
   const [search, searchval] = useState("");
@@ -55,11 +55,20 @@ export default class Search extends React.Component {
   fetchData = async () => {
     try {
       this.setState({ loading: true });
+      const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
-        "https://backapi.herokuapp.com/posts"
+        // "http://localhost:3333/posts",
+        "https://backapi.herokuapp.com/posts",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
       );
       const apidata = await fetchedData.json();
-      this.setState({ data: apidata, loading: false });
+      console.log(apidata.data);
+      this.setState({ data: apidata.data, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
     }
@@ -85,20 +94,20 @@ export default class Search extends React.Component {
                 <Text>11111 error</Text>
               </View>
             ) : (
-                <FlatList
-                style={{marginBottom: 52}}
+              <FlatList
+                style={{ marginBottom: 52 }}
                 numColumns={3}
-                columnWrapperStyle={{justifyContent: "space-between"}} 
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={this._onRefresh.bind(this)}
+                columnWrapperStyle={{ justifyContent: "space-between" }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={this.state.refreshing}
+                    onRefresh={this._onRefresh.bind(this)}
+                  />
+                }
+                data={this.state.data.slice(0).reverse()}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => item._id}
               />
-            }
-            data={this.state.data.slice(0).reverse()}
-            renderItem={renderItem}
-            keyExtractor={(data) => this.state._id}
-          />
             )}
           </View>
         )}

@@ -112,7 +112,7 @@ const SignIn = ({ navigation }, props) => {
         });
       if (type === "success") {
         const response = await fetch(
-          `https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,picture.height(200)`
+          `https://graph.facebook.com/me?access_token=${token}&fields=name,email,picture.height(200)`
         );
         const data = await response.json();
         console.log(data);
