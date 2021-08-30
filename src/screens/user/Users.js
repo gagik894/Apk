@@ -61,7 +61,6 @@ export default class Users extends React.Component {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      console.log("profiledata", profiledata);
       this.setState({ profileData: profiledata, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });

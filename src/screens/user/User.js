@@ -13,12 +13,13 @@ import {
   Image,
   RefreshControl,
   DrawerLayoutAndroid,
-  Alert
+  Alert,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Navigation from "../../Navigation/Navigation";
 import Card from "../cards/Card";
-
+import { BottomSheet } from "react-native-btr";
+import Pusher from "pusher-js/react-native";
 export default class Users extends React.Component {
   state = {
     data: [],
@@ -26,12 +27,53 @@ export default class Users extends React.Component {
     loading: false,
     error: false,
     page: 1,
+    visible: false,
+  };
+  Push = () => {
+    const pusher = new Pusher("111c634f224bfb055def", {
+      cluster: "ap2",
+    });
+
+    const refreshData = async()=>{
+      await this.refreshData();
+    }
+    const channel = pusher.subscribe("posts");
+    channel.bind("new", function (data) {
+      refreshData()
+    });
+    channel.bind("deleted", function (data) {
+      refreshData()
+    });
   };
   constructor(props) {
     super(props);
-    this.drawer = React.createRef();
-    this.navigationView = this.navigationView.bind(this);
   }
+  toggleBottomNavigationView = () => {
+    //Toggling the visibility state of the bottom sheet
+    this.setState({ visible: !this.state.visible });
+  };
+  refreshData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const fetchedData = await fetch(
+        "https://backapi.herokuapp.com/posts/profile",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const apidata = await fetchedData.json();
+      apidata.data.map((i, index) => {
+        i.user = apidata.User;
+      });
+      this.setState({ data: apidata.data, visible: false });
+    } catch (error) {
+      this.setState({ error: true});
+      console.log("error", error);
+    }
+  };
   fetchData = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -46,10 +88,10 @@ export default class Users extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
-      apidata.data.map((i,index) =>{
-        i.user = apidata.User
-      })
-      this.setState({ data: apidata.data, loading: false });
+      apidata.data.map((i, index) => {
+        i.user = apidata.User;
+      });
+      this.setState({ data: apidata.data, loading: false, visible: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
       console.log("error", error);
@@ -58,7 +100,6 @@ export default class Users extends React.Component {
   fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      this.setState({ loading: true });
       const fetchedProfileData = await fetch(
         "https://backapi.herokuapp.com/auth/profile",
         {
@@ -69,21 +110,20 @@ export default class Users extends React.Component {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      this.setState({ profileData: profiledata, loading: false });
+      this.setState({ profileData: profiledata });
     } catch (error) {
-      this.setState({ error: true, loading: false });
+      this.setState({ error: true, loading: false, visible: false });
       console.log("error", error);
     }
   };
 
   fetchDelete = async () => {
     try {
-      console.log("tr")
       const token = await AsyncStorage.getItem("token");
       this.setState({ loading: true });
       const fetchedProfileData = await fetch(
-        "http://localhost:3333/auth/remove",
-        // "https://backapi.herokuapp.com/auth/remove",
+        // "http://localhost:3333/auth/remove",
+        "https://backapi.herokuapp.com/auth/remove",
         {
           method: "GET",
           headers: {
@@ -92,9 +132,8 @@ export default class Users extends React.Component {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      console.log(profiledata)
-      this.setState({ loading: false });
-      this.removeToken()
+      this.setState({ loading: false, visible: false });
+      this.removeToken();
       this.props.navigation.navigate("SignIn", { data: "name" });
     } catch (error) {
       this.setState({ error: true, loading: false });
@@ -105,177 +144,169 @@ export default class Users extends React.Component {
   removeToken = async () => {
     await AsyncStorage.removeItem("token");
   };
-  
-  navigationView = () => (
-    <View style={[styles.container1, styles.navigationContainer]}>
-      <Text style={styles.paragraph}>I'm in the Drawer!</Text>
-      <Button
-        title="Delete"
-        onPress={() =>  Alert.alert('Hold on!', 'Are you sure you want to DELETE your account?', [
-          {
-            text: 'Cancel',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          { text: 'YES', onPress: () => this.fetchDelete() },
-        ])
-      }
-      />
-    </View>
-  );
 
   componentDidMount() {
-    this.fetchData();
     this.fetchProfile();
+    this.fetchData();
+    this.Push()
   }
   async _onRefresh() {
     this.setState({ refreshing: true });
-    await this.fetchData();
+    await this.refreshData();
     await this.fetchProfile();
     this.setState({ refreshing: false });
   }
-  openDrawer = () => { 
-    this.drawer.openDrawer();
-  } 
-  closeDrawer = () =>{ 
-    this.drawer.closeDrawer(); 
-  } 
   render() {
     return (
-      <DrawerLayoutAndroid
-      ref = {(drawer) => { this.drawer = drawer;}}
-
-        drawerWidth={210}
-        drawerPosition={"right"}
-        renderNavigationView={this.navigationView}
-      >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <View style={styles.text}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.removeToken();
-                  this.props.navigation.navigate("SignIn", { data: "name" });
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>
-                  {this.state.profileData.username}
-                </Text>
-              </TouchableOpacity>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.text}>
+            <TouchableOpacity
+              onPress={() => {
+                this.removeToken();
+                this.props.navigation.navigate("SignIn", { data: "name" });
+              }}
+            >
+              <Text style={{ fontSize: 20 }}>
+                {this.state.profileData.username}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.text}>
+            <TouchableOpacity onPress={() => this.toggleBottomNavigationView()}>
+              <Text style={{ fontSize: 15 }}>More</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {this.state.loading ? (
+          <ActivityIndicator size="large" color="black" />
+        ) : (
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this._onRefresh.bind(this)}
+              />
+            }
+          >
+            <View>
+              <View style={styles.card}>
+                <View style={styles.coverimg}>
+                  <ImageBackground
+                    source={{
+                      uri: this.state.profileData.coverImgUrl,
+                    }}
+                    style={{
+                      alignSelf: "center",
+                      height: 193,
+                      width: "100%",
+                      paddingTop: 193 / 2,
+                    }}
+                  >
+                    <View style={{ height: 148, width: 148, marginLeft: 5 }}>
+                      <Image
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          borderRadius: 148 / 2,
+                          backgroundColor: "#eaeded",
+                        }}
+                        source={{
+                          uri: this.state.profileData.avatar,
+                        }}
+                      ></Image>
+                    </View>
+                  </ImageBackground>
+                </View>
+                <View style={styles.text1}>
+                  <Text
+                    style={{
+                      fontSize: 25,
+                    }}
+                  >
+                    {this.state.profileData.fullname}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.card2}>
+                <View style={styles.follows}>
+                  <TouchableOpacity>
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: "blue",
+                      }}
+                    >
+                      55
+                    </Text>
+                    <Text style={{ textAlign: "center" }}>Followers</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.follows}>
+                  <TouchableOpacity>
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: "blue",
+                      }}
+                    >
+                      15
+                    </Text>
+                    <Text style={{ textAlign: "center" }}>Followings</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {this.state.error ? (
+                <View>
+                  <Text>Something went wrong!!</Text>
+                </View>
+              ) : (
+                <View>
+                  <View style={styles.container1}>
+                    {this.state.data
+                      .slice(0)
+                      .reverse()
+                      .map((i, index) => {
+                        return <Card key={index} data={i} />;
+                      })}
+                  </View>
+                </View>
+              )}
             </View>
-            <View style={styles.text}>
+          </ScrollView>
+        )}
+        <BottomSheet
+          visible={this.state.visible}
+          //setting the visibility state of the bottom shee
+          onBackButtonPress={this.toggleBottomNavigationView}
+          //Toggling the visibility state on the click of the back botton
+          onBackdropPress={this.toggleBottomNavigationView}
+          //Toggling the visibility state on the clicking out side of the sheet
+        >
+          {/*Bottom Sheet inner View*/}
+          <View style={styles.bottomNavigationView}>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "column",
+                justifyContent: "space-around",
+                width: "100%",
+              }}
+            >
               <TouchableOpacity
-                onPress={() => this.openDrawer()}
+                style={styles.bottomNavigationViewButton}
+                onPress={() => this.fetchDelete()}
               >
-                <Text style={{ fontSize: 15 }}>
-                  More
-                </Text>
+                <Text style={{ fontSize: 18, color: "red" }}>Delete Account</Text>
               </TouchableOpacity>
             </View>
           </View>
-          {this.state.loading ? (
-            <ActivityIndicator size="large" color="red" />
-          ) : (
-            <ScrollView
-              refreshControl={
-                <RefreshControl
-                  refreshing={this.state.refreshing}
-                  onRefresh={this._onRefresh.bind(this)}
-                />
-              }
-            >
-              <View>
-                <View style={styles.card}>
-                  <View style={styles.coverimg}>
-                    <ImageBackground
-                      source={{
-                        uri: this.state.profileData.coverImgUrl,
-                      }}
-                      style={{
-                        alignSelf: "center",
-                        height: 193,
-                        width: "100%",
-                        paddingTop: 193 / 2,
-                      }}
-                    >
-                      <View style={{ height: 148, width: 148, marginLeft: 5 }}>
-                        <Image
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 148 / 2,
-                            backgroundColor: "#eaeded",
-                          }}
-                          source={{
-                            uri: this.state.profileData.avatar,
-                          }}
-                        ></Image>
-                      </View>
-                    </ImageBackground>
-                  </View>
-                  <View style={styles.text1}>
-                    <Text
-                      style={{
-                        fontSize: 25,
-                      }}
-                    >
-                      {this.state.profileData.fullname}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.card2}>
-                  <View style={styles.follows}>
-                    <TouchableOpacity>
-                      <Text
-                        style={{
-                          textAlign: "center",
-                          fontSize: 16,
-                          fontWeight: "bold",
-                          color: "blue",
-                        }}
-                      >
-                        55
-                      </Text>
-                      <Text style={{ textAlign: "center" }}>Followers</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.follows}>
-                    <TouchableOpacity>
-                      <Text
-                        style={{
-                          textAlign: "center",
-                          fontSize: 16,
-                          fontWeight: "bold",
-                          color: "blue",
-                        }}
-                      >
-                        15
-                      </Text>
-                      <Text style={{ textAlign: "center" }}>Followings</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                {this.state.error ? (
-                  <View>
-                    <Text>Something went wrong!!</Text>
-                  </View>
-                ) : (
-                  <View>
-                    <View style={styles.container1}>
-                      {this.state.data
-                        .slice(0)
-                        .reverse()
-                        .map((i, index) => {
-                          return <Card key={index} data={i} />;
-                        })}
-                    </View>
-                  </View>
-                )}
-              </View>
-            </ScrollView>
-          )}
-        </View>
-      </DrawerLayoutAndroid>
+        </BottomSheet>
+      </View>
     );
   }
 }
@@ -346,18 +377,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  paragraph: {
-    padding: 16,
-    fontSize: 15,
-    textAlign: "center",
-  },
-  container1: {
-    flex: 1,
-    alignItems: "center",
+  bottomNavigationView: {
+    backgroundColor: "#fff",
+    width: "100%",
+    height: 70,
     justifyContent: "center",
-    padding: 16,
+    alignItems: "center",
   },
-  navigationContainer: {
-    backgroundColor: "#ecf0f1",
+  bottomNavigationViewButton: {
+    width: "100%",
+    justifyContent: "center",
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+    paddingHorizontal: 20,
+    height: 70,
   },
 });

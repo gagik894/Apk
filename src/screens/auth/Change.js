@@ -49,14 +49,12 @@ const SignUp = ({ navigation }) => {
 
   const verifyFetch = async (value) =>{
     setloading(true);
-    console.log("tr")
     const codeHash = await SecureStore.getItemAsync("secCode")
     const code = value.code
     const sent = {
       codeHash: codeHash,
       code: code,
     }
-    console.log(sent)
     try {
       const verifyedFetch = await fetch(
         // "http://localhost:3333/auth/passwordchange/verify",
@@ -104,7 +102,6 @@ const SignUp = ({ navigation }) => {
         seterror(data.error);
         return;
       };
-      console.log(data);
       alert("Password sucscesfully changed")
       navigation.navigate("SignIn")
       // navigation.navigate("BottomTabNavigator");
@@ -137,7 +134,6 @@ const SignUp = ({ navigation }) => {
       }
       setloading(false);
         setsignup(4);
-        console.log(data.secCode)
         SecureStore.setItemAsync("secCode", data.secCode)
         seterror(null);
       

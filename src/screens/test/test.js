@@ -32,7 +32,6 @@ export default function App() {
           `https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,picture.height(500)`
         );
         const data = await response.json()
-        console.log(data);
       } else {
         // type === 'cancel'
       }

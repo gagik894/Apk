@@ -21,8 +21,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const SignIn = ({ navigation }, props) => {
-  console.log(props);
+const SignIn = ({ navigation }) => {
   const [error, seterror] = React.useState("");
   const [keyboardstatus, setkeyboardstatus] = React.useState(false);
   const [loading, setloading] = React.useState(false);
@@ -49,7 +48,6 @@ const SignIn = ({ navigation }, props) => {
 
   const signUpFetch = async (value) => {
     setloading(true);
-    console.log("signup");
     try {
       const fetchedSignUp = await fetch(
         // "http://localhost:3333/auth/fbsignup",
@@ -67,7 +65,6 @@ const SignIn = ({ navigation }, props) => {
       if (data.error) {
         seterror(data.error);
       } else {
-        console.log(data.auth_token);
         await AsyncStorage.setItem("token", data.auth_token);
         navigation.navigate("BottomTabNavigator");
       }
@@ -95,7 +92,6 @@ const SignIn = ({ navigation }, props) => {
         seterror(data.error);
       } else {
         await AsyncStorage.setItem("token", data.auth_token);
-        console.log(data.auth_token);
         navigation.navigate("BottomTabNavigator");
       }
     } catch (error) {
@@ -108,18 +104,18 @@ const SignIn = ({ navigation }, props) => {
       await Facebook.initializeAsync("804105460333300");
       const { type, token, expires, permissions, declinedPermissions } =
         await Facebook.logInWithReadPermissionsAsync({
-          permissions: ["public_profile"],
+          permissions: ["public_profile", "email"],
         });
       if (type === "success") {
         const response = await fetch(
           `https://graph.facebook.com/me?access_token=${token}&fields=name,email,picture.height(200)`
         );
         const data = await response.json();
-        console.log(data);
+
         const send = {
           username: data.name.split(" ").join("_"),
           fullname: data.name,
-          email: data.email,
+          email: data.email || null,
           avatar: data.picture.data.url,
         };
         signUpFetch(send);
@@ -320,7 +316,7 @@ const SignIn = ({ navigation }, props) => {
                         onPress={() => facebookLogIn()}
                       >
                         <View>
-                          {loading ? (
+                          {fbloading ? (
                             <ActivityIndicator color="#fff" />
                           ) : (
                             <Text

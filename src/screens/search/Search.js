@@ -12,6 +12,7 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import MiniCard from "../cards/MiniCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Pusher from "pusher-js/react-native";
 const renderItem = ({ item }) => {
   return <MiniCard data={item} />;
 };
@@ -51,7 +52,41 @@ export default class Search extends React.Component {
     page: 1,
     refreshing: false,
   };
+  Push = () => {
+    const pusher = new Pusher("111c634f224bfb055def", {
+      cluster: "ap2",
+    });
 
+    const refreshData = async()=>{
+      await this.refreshData();
+    }
+    const channel = pusher.subscribe("posts");
+    channel.bind("new", function (data) {
+      refreshData()
+    });
+    channel.bind("deleted", function (data) {
+      refreshData()
+    });
+  };
+  refreshData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const fetchedData = await fetch(
+        // "http://localhost:3333/posts",
+        "https://backapi.herokuapp.com/posts",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const apidata = await fetchedData.json();
+      this.setState({ data: apidata.data });
+    } catch (error) {
+      this.setState({ error: true });
+    }
+  };
   fetchData = async () => {
     try {
       this.setState({ loading: true });
@@ -67,7 +102,6 @@ export default class Search extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
-      console.log(apidata.data);
       this.setState({ data: apidata.data, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
@@ -75,10 +109,11 @@ export default class Search extends React.Component {
   };
   componentDidMount() {
     this.fetchData();
+    this.Push()
   }
   async _onRefresh() {
     this.setState({ refreshing: true });
-    await this.fetchData();
+    await this.refreshData();
     this.setState({ refreshing: false });
   }
   render() {
@@ -86,7 +121,7 @@ export default class Search extends React.Component {
       <View style={styles.container}>
         <Header />
         {this.state.loading ? (
-          <ActivityIndicator size="large" color="red" />
+          <ActivityIndicator size="large" color="black" />
         ) : (
           <View>
             {this.state.error ? (

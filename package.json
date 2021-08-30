@@ -28,6 +28,8 @@
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
     "react-native-animatable": "^1.3.3",
+    "react-native-btr": "^2.1.2",
+    "react-native-floating-action": "^1.22.0",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-keyboard-aware-scrollview": "^2.1.0",
     "react-native-keyboard-spacer": "^0.4.1",

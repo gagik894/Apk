@@ -14,7 +14,7 @@ import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const FormData = require("form-data");
 
-export default function ImagePickerExample() {
+export default function ImagePickerExample({ navigation }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const fetchAdd = async (props) => {
@@ -28,8 +28,8 @@ export default function ImagePickerExample() {
       });
       const token = await AsyncStorage.getItem("token");
       const fetchedProfileData = await fetch(
-        // "http://localhost:3333/posts/add",
-        "https://backapi.herokuapp.com/posts/add",
+        "http://localhost:3333/posts/add",
+        // "https://backapi.herokuapp.com/posts/add",
         {
           method: "Post",
           headers: {
@@ -41,6 +41,7 @@ export default function ImagePickerExample() {
       );
       const profiledata = await fetchedProfileData.json();
       setLoading(false);
+      navigation.navigate("Cards");
     } catch (error) {
       setLoading(false);
       console.log("erroor", error);

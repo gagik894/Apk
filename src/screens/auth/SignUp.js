@@ -76,7 +76,6 @@ const SignUp = ({ navigation }) => {
         return;
       }
       await AsyncStorage.setItem("token", data.auth_token);
-      console.log(data.auth_token);
       await SecureStore.deleteItemAsync("secCode");
       await SecureStore.deleteItemAsync("profileData");
       navigation.navigate("BottomTabNavigator");
@@ -109,11 +108,9 @@ const SignUp = ({ navigation }) => {
       const profileData = JSON.stringify(data.data);
       await SecureStore.setItemAsync("profileData", profileData);
       await SecureStore.setItemAsync("secCode", data.secCode);
-      const testItem = await SecureStore.getItemAsync("secCode");
       // await AsyncStorage.setItem("token", data.auth_token);
       setsignup(4);
       seterror(false);
-      console.log(testItem);
       // navigation.navigate("BottomTabNavigator");
     } catch (error) {
       console.log(error);

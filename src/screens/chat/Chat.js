@@ -12,13 +12,15 @@ import {
   FlatList,
   TextInput,
   BackHandler,
-  Alert
+  Alert,
+  TouchableOpacity,
 } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
 import Chatform from "./ChatForm";
 import Pusher from "pusher-js/react-native";
 import { NetInfoCellularGeneration } from "@react-native-community/netinfo";
 import { FontAwesome } from "@expo/vector-icons";
+import { BottomSheet } from "react-native-btr";
 //page 1 single chat
 function Chats(props) {
   let UserId;
@@ -87,6 +89,63 @@ function Chats(props) {
   );
 }
 
+function Users(props) {
+  let UserId;
+  if (props.user == props.data.userId._id) {
+    UserId = props.data.userId1;
+  } else {
+    UserId = props.data.userId;
+  }
+  return (
+    <View>
+      <TouchableOpacity
+        onPress={() => {
+          props.handler({
+            messages: props.data.chat,
+            userAvatar: UserId.avatar,
+            otherUser: UserId,
+          });
+        }}
+      >
+        <View style={styles.chat}>
+          <View style={styles.left}>
+            <Image
+              source={
+                {
+                  uri: UserId.avatar,
+                }
+              }
+              style={{
+                width: "80%",
+                height: "80%",
+                borderRadius: 15,
+                backgroundColor: "#eaeded",
+              }}
+            />
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "flex-start",
+              width: "100%",
+              paddingHorizontal: 10,
+            }}
+          >
+            <View>
+              <Text
+                numberOfLines={1}
+                style={{ fontSize: 20, fontFamily: "sans-serif" }}
+              >
+               { UserId.username}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export default class Chat extends React.Component {
   state = {
     data: [],
@@ -99,27 +158,35 @@ export default class Chat extends React.Component {
     user: null,
     textval: null,
     otherUser: null,
+    visible: false,
+    users: [],
   };
 
-  BackBtn = ()=>{
+  BackBtn = () => {
     const backAction = () => {
       if (this.state.clicked == true) {
-        this.setState({clicked: false})
+        this.setState({ clicked: false });
         return true;
-      }   
+      }
     };
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
 
     return () => backHandler.remove();
-  }
+  };
+  toggleBottomNavigationView = () => {
+    //Toggling the visibility state of the bottom sheet
+    this.setState({ visible: !this.state.visible });
+  };
   Push = () => {
     const pusher = new Pusher("111c634f224bfb055def", {
       cluster: "ap2",
     });
 
     const channel = pusher.subscribe("messages");
-    // alert(this.state.user)
     let user = this.state.user;
     const addNewData = (props) => {
       let newDataArray = [];
@@ -158,13 +225,9 @@ export default class Chat extends React.Component {
 
     channel.bind("new", function (data) {
       if (user == data.user || user == data.user1) {
-        // alert("true");
         refresh();
         addNewData(data);
       }
-
-      // console.log(JSON.stringify(data));
-      // alert(JSON.stringify(data));
     });
   };
 
@@ -183,10 +246,11 @@ export default class Chat extends React.Component {
       clicked: true,
       otherUser: props.otherUser,
       messageData: messageData,
+      visible: false,
     });
   }
 
-  fetchMessage = async () => {
+  fetchMessageAdd = async () => {
     if (this.state.textval) {
       try {
         const token = await AsyncStorage.getItem("token");
@@ -210,7 +274,6 @@ export default class Chat extends React.Component {
           }
         );
         const data = await fetchedData.json();
-        console.log(data);
       } catch (error) {
         console.log("error", error);
       }
@@ -218,7 +281,6 @@ export default class Chat extends React.Component {
   };
   ref = async () => {
     try {
-      console.log("tr");
       const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
         // "http://localhost:3333/messages",
@@ -257,13 +319,21 @@ export default class Chat extends React.Component {
         }
       );
       const data = await fetchedData.json();
+      let users = []
+      let messages = []
+      await data.messageData.map((i, index) =>{
+        if(i.chat.length != 0){
+          messages.push(i)
+        }
+      })
       this.setState({
-        data: data.messageData,
+        data: messages,
+        users: data.messageData ,
         user: data.user,
         loading: false,
       });
     } catch (error) {
-      console.log(error, "f");
+      alert(error)
       this.setState({ error: true, loading: false });
     }
   };
@@ -272,6 +342,7 @@ export default class Chat extends React.Component {
     await this.fetchData();
     this.Push();
     this.BackBtn();
+    // this.fetchUsers();
   }
   componentDidUpdate() {}
   async _onRefresh() {
@@ -305,7 +376,7 @@ export default class Chat extends React.Component {
                   style={[
                     {
                       fontSize: 20,
-                      justifySelf: "center",
+                      alignSelf: "center",
                     },
                   ]}
                 >
@@ -391,23 +462,27 @@ export default class Chat extends React.Component {
                   />
                 }
               >
-                {this.state.data
-                  .slice(0)
-                  .reverse()
-                  .map((i, index) => {
-                    return (
-                      <Chats
-                        key={index}
-                        data={i}
-                        user={this.state.user}
-                        handler={this.handler}
-                      />
-                    );
-                  })}
+                {this.state.data == [] ? (
+                  <Text>Wow such empty</Text>
+                ) : (
+                  this.state.data
+                    .slice(0)
+                    .reverse()
+                    .map((i, index) => {
+                      return (
+                        <Chats
+                          key={index}
+                          data={i}
+                          user={this.state.user}
+                          handler={this.handler}
+                        />  
+                      );
+                    })                  
+                )}
               </ScrollView>
             )}
             <View
-              style={{ flexDirection: "column", justifyContent: "flex-end" }}
+              style={{ flexDirection: "column", justifyContent: "flex-end", marginHorizontal: 10, marginBottom: 10}}
             >
               {this.state.clicked ? (
                 <View style={styles.text}>
@@ -424,19 +499,66 @@ export default class Chat extends React.Component {
                       borderRadius: 30,
                       borderWidth: 2,
                       borderColor: "red",
-                      width: "87%",
+                      width: "90%",
                       height: "100%",
                       fontSize: 15,
                     }}
                   />
-                  <TouchableOpacity onPress={() => this.fetchMessage()}>
+                  <TouchableOpacity onPress={() => this.fetchMessageAdd()}>
                     <FontAwesome name="paper-plane" color="black" size={27} />
                   </TouchableOpacity>
                 </View>
-              ) : null}
+              ) : (
+                <TouchableOpacity
+                  onPress={() => this.toggleBottomNavigationView()}
+                  style={{
+                    height: 60,
+                    width: 60,
+                    borderColor: "black",
+                    borderWidth: 1,
+                    alignSelf: "flex-end",
+                    borderRadius: 30,
+                    position: "absolute",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#ffff"
+                  }}
+                >
+                  <Image
+                source={require("../../../assets/img/newchat.png")}
+                style={{ width: "80%", height: "80%" }}
+              />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
+        <BottomSheet
+          visible={this.state.visible}
+          //setting the visibility state of the bottom shee
+          onBackButtonPress={this.toggleBottomNavigationView}
+          //Toggling the visibility state on the click of the back botton
+          onBackdropPress={this.toggleBottomNavigationView}
+          //Toggling the visibility state on the clicking out side of the sheet
+        >
+          {/*Bottom Sheet inner View*/}
+          <View style={styles.bottomNavigationView}>
+            <View style={{ flex: 1, justifyContent: "space-between" }}>
+              <ScrollView>
+                {this.state.users.map((i, index) => {
+                      return (
+                        <Users
+                          key={index}
+                          data={i}
+                          user={this.state.user}
+                          handler={this.handler}
+                        />
+                      );
+                    })}
+              </ScrollView>
+            </View>
+          </View>
+        </BottomSheet>
       </View>
     );
   }
@@ -454,7 +576,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 3,
   },
-  container1: {
+  container1: { 
     height: "90%",
     justifyContent: "space-around",
   },
@@ -473,6 +595,7 @@ const styles = StyleSheet.create({
   chat: {
     marginTop: 8,
     height: 80,
+    marginHorizontal: 2,
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#fff",
@@ -498,7 +621,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 2,
     justifyContent: "space-around",
-    marginVertical: 10,
+    marginTop: 10,
     alignItems: "center",
+  },
+  bottomNavigationView: {
+    backgroundColor: "#eaeded",
+    width: "100%",
+    height: "100%",
+  },
+  bottomNavigationViewButton: {
+    width: "100%",
+    justifyContent: "center",
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+    paddingHorizontal: 20,
+    height: 70,
   },
 });

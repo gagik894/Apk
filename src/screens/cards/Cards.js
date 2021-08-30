@@ -13,6 +13,7 @@ import {
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Card from "./Card";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Pusher from "pusher-js/react-native";
 const renderItem = ({ item }) => {
   return <Card data={item} />;
 };
@@ -26,9 +27,49 @@ export default class Cards extends React.Component {
     user: null,
   };
 
+  Push = () => {
+    const pusher = new Pusher("111c634f224bfb055def", {
+      cluster: "ap2",
+    });
+
+    const refreshData = async()=>{
+      await this.refreshData();
+    }
+    const channel = pusher.subscribe("posts");
+    channel.bind("new", function (data) {
+      refreshData()
+    });
+    channel.bind("deleted", function (data) {
+      refreshData()
+    });
+  };
+
+  refreshData = async () => {
+    try {  
+      const token = await AsyncStorage.getItem("token");
+      const fetchedData = await fetch(
+        // "http://localhost:3333/posts",
+        "https://backapi.herokuapp.com/posts",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const apidata = await fetchedData.json();
+      apidata.data.map((i,index) =>{
+        i.user = apidata.User
+      })
+      this.setState({ data: apidata.data});
+    } catch (error) {
+      this.setState({ error: true});
+      console.log(error);
+    }
+  };
   fetchData = async () => {
     try {
-      this.setState({ loading: true });
+        this.setState({ loading: true });    
       const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
         // "http://localhost:3333/posts",
@@ -50,13 +91,17 @@ export default class Cards extends React.Component {
       console.log(error);
     }
   };
-
-  componentDidMount() {
-    this.fetchData();
+  constructor(props) {
+    super(props);
+    this.Push = this.Push.bind(this);
+  }
+  async componentDidMount() {
+    await this.fetchData();
+    this.Push()
   }
   async _onRefresh() {
     this.setState({ refreshing: true });
-    await this.fetchData();
+    await this.refreshData()
     this.setState({ refreshing: false });
   }
   render() {
@@ -102,7 +147,7 @@ export default class Cards extends React.Component {
           </View>
         </View>
         {this.state.loading ? (
-          <ActivityIndicator size="large" color="red" />
+          <ActivityIndicator size="large" color="grey" />
         ) : this.state.error ? (
           <View>
             <Text>Something went wrong</Text>
