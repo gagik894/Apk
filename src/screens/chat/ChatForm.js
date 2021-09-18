@@ -18,7 +18,7 @@ export default function Chatform(props) {
         <View style={styles.left}>
           <Image
             source={{
-              uri: props.userData.avatar,
+              uri:props.userData.avatar,
             }}
             style={{
               width: 40,

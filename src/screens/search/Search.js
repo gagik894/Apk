@@ -61,10 +61,7 @@ export default class Search extends React.Component {
       await this.refreshData();
     }
     const channel = pusher.subscribe("posts");
-    channel.bind("new", function (data) {
-      refreshData()
-    });
-    channel.bind("deleted", function (data) {
+    channel.bind("update", function (data) {
       refreshData()
     });
   };

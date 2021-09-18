@@ -36,10 +36,7 @@ export default class Cards extends React.Component {
       await this.refreshData();
     }
     const channel = pusher.subscribe("posts");
-    channel.bind("new", function (data) {
-      refreshData()
-    });
-    channel.bind("deleted", function (data) {
+    channel.bind("update", function (data) {
       refreshData()
     });
   };
@@ -110,7 +107,7 @@ export default class Cards extends React.Component {
         <View style={styles.mainheader}>
           <View style={styles.headerItems}>
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("Add")}
+              onPress={() => this.props.navigation.navigate("Add", {data: "post"})}
             >
               <Image
                 source={require("../../../assets/img/camera.png")}

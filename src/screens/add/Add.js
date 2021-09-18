@@ -14,9 +14,11 @@ import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const FormData = require("form-data");
 
-export default function ImagePickerExample({ navigation }) {
+export default function ImagePickerExample(props) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const go =props.navigation.goBack
+  const picType = props.route.params.data;
   const fetchAdd = async (props) => {
     try {
       setLoading(true);
@@ -28,8 +30,8 @@ export default function ImagePickerExample({ navigation }) {
       });
       const token = await AsyncStorage.getItem("token");
       const fetchedProfileData = await fetch(
-        "http://localhost:3333/posts/add",
-        // "https://backapi.herokuapp.com/posts/add",
+        `http://localhost:3333/posts/add/${picType}`,
+        // `https://backapi.herokuapp.com/posts/add/${picType}`,
         {
           method: "Post",
           headers: {
@@ -41,7 +43,7 @@ export default function ImagePickerExample({ navigation }) {
       );
       const profiledata = await fetchedProfileData.json();
       setLoading(false);
-      navigation.navigate("Cards");
+      go();
     } catch (error) {
       setLoading(false);
       console.log("erroor", error);
@@ -57,17 +59,27 @@ export default function ImagePickerExample({ navigation }) {
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+    let result;
+    if (picType == "avatar" || picType == "post") {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.6,
+      });
+    } else {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [2, 1],
+        quality: 0.6,
+      });
+    }
 
     // Explore the result
 
     if (!result.cancelled) {
-      fetchAdd(result.uri)
+      fetchAdd(result.uri);
     }
   };
 
@@ -84,26 +96,36 @@ export default function ImagePickerExample({ navigation }) {
   }, []);
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+    let result;
+    if (picType == "avatar" || picType == "post") {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [2, 1],
+        quality: 0.8,
+      });
+    }
 
     if (!result.cancelled) {
-      fetchAdd(result.uri)
+      fetchAdd(result.uri);
     }
   };
 
   return (
     <View style={styles.screen}>
-       <View style={styles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Button onPress={pickImage} title="Select an image" />
         <Button onPress={openCamera} title="Open camera" />
       </View>
       {/* <Button title="Pick an image from camera roll" onPress={pickImage} /> */}
-          {loading ? <ActivityIndicator color="black" size="large" /> : null}
+      {loading ? <ActivityIndicator color="black" size="large" /> : null}
       {/* <Button title="Sent" onPress={() => fetchAdd(image)} /> */}
       {/* {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />

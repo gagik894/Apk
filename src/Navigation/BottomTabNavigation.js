@@ -21,6 +21,7 @@ function UserNavigation(props) {
   return (
     <Stack.Navigator headerMode={"none"}>
       <Stack.Screen name="User" component={User} />
+      <Stack.Screen name="Add" component={Add} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="Change" component={Change} />
@@ -122,6 +123,8 @@ function getScreen(route) {
   switch (routeName) {
     case "User":
       return true;
+    case "Add":
+      return false;
     case "SignIn":
       return false;
     case "SignUp":

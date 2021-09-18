@@ -109,7 +109,7 @@ export default class Users extends React.Component {
                           borderRadius: 148 / 2,
                         }}
                         source={{
-                          uri: this.state.profileData.avatar,
+                          uri: `https://drive.google.com/uc?export=wiew&id=${this.state.profileData.avatar}`,
                         }}
                       ></Image>
                     </View>

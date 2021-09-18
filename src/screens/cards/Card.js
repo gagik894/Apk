@@ -10,8 +10,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
 
-export default function Card(props, user) {
-  const [liked, setlike] = useState(false);
+export default function Card(props) {
+  const [liked, setlike] = useState(false); 
   const [disliked, setdislike] = useState(false);
   const [visible, setVisible] = useState(false);
   const toggleBottomNavigationView = () => {
@@ -40,10 +40,12 @@ export default function Card(props, user) {
   }
   async function fetchLike(value) {
     const send = { like: value };
+    
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedLogin = await fetch(
         `https://backapi.herokuapp.com/posts/post/${props.data._id}/like`,
+        // `http://localhost:3333/posts/post/${props.data._id}/like`,
         {
           method: "POST",
           headers: {
@@ -54,18 +56,43 @@ export default function Card(props, user) {
         }
       );
       const data = await fetchedLogin.json();
+      
     } catch (error) {
       console.log(error);
     }
   }
-
+ if (props.data.likedpeople.length !=0) {
+    props.data.likedpeople.map((i, index)=>{
+    if (i == props.data.user && liked == false) {
+      setlike(true)
+      if (disliked == true) {
+        setdislike(false)
+      } 
+    }
+  })
+}else if (liked == true) {
+  setlike(false)
+}
+if (props.data.dislikedpeople.length !=0) {
+  
+    props.data.dislikedpeople.map((i, index)=>{
+    if (i == props.data.user && disliked == false) {
+      setdislike(true)
+      if (liked == true) {
+        setlike(false)
+      }    
+    }
+  })
+}else if (disliked == true) {
+  setdislike(false)
+}
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.profile}>
           <Image
             source={{
-              uri: props.data.userId.avatar,
+              uri:`https://drive.google.com/uc?export=wiew&id=${props.data.userId.avatar}` ,
             }}
             style={{
               width: "85%",
@@ -101,11 +128,14 @@ export default function Card(props, user) {
           <TouchableOpacity
             style={styles.more1}
             onPress={() => {
-              setlike(!liked);
-              setdislike(false);
+              setdislike(false)
+              setlike(false)
               if (liked) {
                 fetchLike("unlike");
-              } else {
+              } else if(disliked){
+                fetchLike("like");
+                fetchLike("undislike")
+              }else{
                 fetchLike("like");
               }
             }}
@@ -126,30 +156,31 @@ export default function Card(props, user) {
         <View style={styles.text1}>
           <View style={styles.like}>
             <Text style={{ fontSize: 15 }}>
-              {liked ? props.data.likes + 1 : props.data.likes}
+              {props.data.likes}
             </Text>
           </View>
           <View style={styles.likes}>
             <Text style={{ fontSize: 15 }}>
-              {(liked ? props.data.likes + 1 : props.data.likes) -
-                (disliked ? props.data.dislikes + 1 : props.data.dislikes)}
+              {(props.data.likes )- (props.data.dislikes)}
             </Text>
           </View>
           <View style={styles.dislikes}>
             <Text style={{ fontSize: 15 }}>
-              {disliked ? props.data.dislikes + 1 : props.data.dislikes}
+              {props.data.dislikes}
             </Text>
           </View>
         </View>
         <View style={styles.more}>
           <TouchableOpacity
             style={styles.more1}
-            onPress={() => {
-              setdislike(!disliked);
-              setlike(false);
+            onPress={() => {setdislike(false)
+              setlike(false)
               if (disliked) {
                 fetchLike("undislike");
-              } else {
+              } else if(liked){
+                fetchLike("dislike");
+                fetchLike("unlike");
+              }else{
                 fetchLike("dislike");
               }
             }}

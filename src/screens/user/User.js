@@ -14,6 +14,7 @@ import {
   RefreshControl,
   DrawerLayoutAndroid,
   Alert,
+  Dimensions,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Navigation from "../../Navigation/Navigation";
@@ -38,10 +39,11 @@ export default class Users extends React.Component {
       await this.refreshData();
     }
     const channel = pusher.subscribe("posts");
-    channel.bind("new", function (data) {
+    channel.bind("update", function (data) {
       refreshData()
     });
-    channel.bind("deleted", function (data) {
+    const channel1 = pusher.subscribe("users");
+    channel1.bind("update", function (data) {
       refreshData()
     });
   };
@@ -64,11 +66,21 @@ export default class Users extends React.Component {
           },
         }
       );
+      const fetchedProfileData = await fetch(
+        "https://backapi.herokuapp.com/auth/profile",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const profiledata = await fetchedProfileData.json();
       const apidata = await fetchedData.json();
       apidata.data.map((i, index) => {
         i.user = apidata.User;
       });
-      this.setState({ data: apidata.data, visible: false });
+      this.setState({ data: apidata.data, visible: false, profileData: profiledata });
     } catch (error) {
       this.setState({ error: true});
       console.log("error", error);
@@ -191,19 +203,20 @@ export default class Users extends React.Component {
           >
             <View>
               <View style={styles.card}>
-                <View style={styles.coverimg}>
+                <TouchableOpacity onPress={()=> this.props.navigation.navigate("Add", {data: "cover"})} style={styles.coverimg}>
                   <ImageBackground
                     source={{
-                      uri: this.state.profileData.coverImgUrl,
+                      uri: `https://drive.google.com/uc?export=wiew&id=${this.state.profileData.coverImgUrl}`,
                     }}
                     style={{
+                      borderRadius: 15,
                       alignSelf: "center",
-                      height: 193,
+                      height: height,
                       width: "100%",
-                      paddingTop: 193 / 2,
+                      paddingTop: height / 2,
                     }}
                   >
-                    <View style={{ height: 148, width: 148, marginLeft: 5 }}>
+                    <TouchableOpacity onPress={()=> this.props.navigation.navigate("Add", {data: "avatar"})} style={{ height: 148, width: 148, marginLeft: 5 }}>
                       <Image
                         style={{
                           height: "100%",
@@ -212,12 +225,12 @@ export default class Users extends React.Component {
                           backgroundColor: "#eaeded",
                         }}
                         source={{
-                          uri: this.state.profileData.avatar,
+                          uri: `https://drive.google.com/uc?export=wiew&id=${this.state.profileData.avatar}`,
                         }}
                       ></Image>
-                    </View>
+                    </TouchableOpacity>
                   </ImageBackground>
-                </View>
+                </TouchableOpacity>
                 <View style={styles.text1}>
                   <Text
                     style={{
@@ -310,7 +323,10 @@ export default class Users extends React.Component {
     );
   }
 }
-
+const width = (Dimensions.get("window").width) * 0.96
+const height = 0.5*width;
+const cardHeight = height + 100
+console.log(width, height)
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#EAEDED",
@@ -339,26 +355,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   card: {
-    height: 322,
-    alignItems: "center",
+    height: cardHeight,
+    alignItems: "flex-end",
+    justifyContent: "center",
     backgroundColor: "#fff",
     borderRadius: 15,
     paddingTop: 20,
     borderWidth: 1,
     borderColor: "grey",
     marginTop: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   coverimg: {
     alignItems: "center",
-    backgroundColor: "red",
-    height: 193,
+    backgroundColor: "#eaeded",
+    height: height,
     width: "96%",
+    borderRadius: 15,
   },
   text1: {
     height: 50,
     width: "100%",
-    marginTop: 60,
-    paddingHorizontal: 15,
+    justifyContent: "center",
+    alignItems: "flex-end",
+    alignSelf: "center",
+    paddingHorizontal: 10,
   },
   follows: {
     height: 36,

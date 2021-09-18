@@ -35,7 +35,7 @@ function Chats(props) {
         onPress={() => {
           props.handler({
             messages: props.data.chat,
-            userAvatar: UserId.avatar,
+            userAvatar: `https://drive.google.com/uc?export=wiew&id=${UserId.avatar}`,
             otherUser: UserId,
           });
         }}
@@ -44,7 +44,7 @@ function Chats(props) {
           <View style={styles.left}>
             <Image
               source={{
-                uri: UserId.avatar,
+                uri: `https://drive.google.com/uc?export=wiew&id=${UserId.avatar}`,
               }}
               style={{
                 width: "80%",
@@ -102,7 +102,7 @@ function Users(props) {
         onPress={() => {
           props.handler({
             messages: props.data.chat,
-            userAvatar: UserId.avatar,
+            userAvatar: `https://drive.google.com/uc?export=wiew&id=${UserId.avatar}`,
             otherUser: UserId,
           });
         }}
@@ -112,7 +112,7 @@ function Users(props) {
             <Image
               source={
                 {
-                  uri: UserId.avatar,
+                  uri: `https://drive.google.com/uc?export=wiew&id=${UserId.avatar}`,
                 }
               }
               style={{
