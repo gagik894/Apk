@@ -8,11 +8,10 @@
     "slug": "Apk",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/img/T.png",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/T.png",
+      "backgroundColor": "#45b6ed"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
