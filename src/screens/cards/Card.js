@@ -11,7 +11,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
 
 export default function Card(props) {
-  const [liked, setlike] = useState(false); 
+  console.log(props)
+  const [liked, setlike] = useState(false);
   const [disliked, setdislike] = useState(false);
   const [visible, setVisible] = useState(false);
   const toggleBottomNavigationView = () => {
@@ -22,8 +23,8 @@ export default function Card(props) {
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedDelet = await fetch(
-        // `https://backapi.herokuapp.com/posts/post/${props.data._id}/delete`,
-        `http://localhost:3333/posts/post/${props.data._id}/delete`,
+        `https://backapi.herokuapp.com/posts/post/${props.data._id}/delete`,
+        // `http://localhost:3333/posts/post/${props.data._id}/delete`,
         {
           method: "delete",
           headers: {
@@ -40,7 +41,7 @@ export default function Card(props) {
   }
   async function fetchLike(value) {
     const send = { like: value };
-    
+
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedLogin = await fetch(
@@ -56,55 +57,71 @@ export default function Card(props) {
         }
       );
       const data = await fetchedLogin.json();
-      
     } catch (error) {
       console.log(error);
     }
   }
- if (props.data.likedpeople.length !=0) {
-    props.data.likedpeople.map((i, index)=>{
-    if (i == props.data.user && liked == false) {
-      setlike(true)
-      if (disliked == true) {
-        setdislike(false)
-      } 
-    }
-  })
-}else if (liked == true) {
-  setlike(false)
-}
-if (props.data.dislikedpeople.length !=0) {
-  
-    props.data.dislikedpeople.map((i, index)=>{
-    if (i == props.data.user && disliked == false) {
-      setdislike(true)
-      if (liked == true) {
-        setlike(false)
-      }    
-    }
-  })
-}else if (disliked == true) {
-  setdislike(false)
-}
+  if (props.data.likedpeople.length != 0) {
+    props.data.likedpeople.map((i, index) => {
+      if (i == props.data.user && liked == false) {
+        setlike(true);
+        if (disliked == true) {
+          setdislike(false);
+        }
+      }
+    });
+  } else if (liked == true) {
+    setlike(false);
+  }
+  if (props.data.dislikedpeople.length != 0) {
+    props.data.dislikedpeople.map((i, index) => {
+      if (i == props.data.user && disliked == false) {
+        setdislike(true);
+        if (liked == true) {
+          setlike(false);
+        }
+      }
+    });
+  } else if (disliked == true) {
+    setdislike(false);
+  }
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.profile}>
-          <Image
-            source={{
-              uri:`https://drive.google.com/uc?export=wiew&id=${props.data.userId.avatar}` ,
+          <TouchableOpacity
+            disabled={(props.data.user == props.data.userId._id)}
+            onPress={() => {
+              props.data.handler({
+                id: props.data.userId._id
+              });
             }}
-            style={{
-              width: "85%",
-              height: "85%",
-              borderRadius: 15,
-              alignSelf: "center",
-              backgroundColor: "#eaeded",
-            }}
-          />
+          >
+            <Image
+              source={{
+                uri: `https://drive.google.com/uc?export=wiew&id=${props.data.userId.avatar}`,
+              }}
+              style={{
+                width: "85%",
+                height: "85%",
+                borderRadius: 15,
+                alignSelf: "center",
+                backgroundColor: "#eaeded",
+              }}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.text}>
+        <TouchableOpacity
+            disabled={(props.data.user == props.data.userId._id)}
+            onPress={() => {
+              props.data.handler({
+                id: props.data.userId._id
+              });
+            }}
+          >
           <Text style={{ fontSize: 15 }}>{props.data.userId.username}</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.more}>
           <TouchableOpacity onPress={toggleBottomNavigationView}>
@@ -128,14 +145,14 @@ if (props.data.dislikedpeople.length !=0) {
           <TouchableOpacity
             style={styles.more1}
             onPress={() => {
-              setdislike(false)
-              setlike(false)
+              setdislike(false);
+              setlike(false);
               if (liked) {
                 fetchLike("unlike");
-              } else if(disliked){
+              } else if (disliked) {
                 fetchLike("like");
-                fetchLike("undislike")
-              }else{
+                fetchLike("undislike");
+              } else {
                 fetchLike("like");
               }
             }}
@@ -155,32 +172,29 @@ if (props.data.dislikedpeople.length !=0) {
         </View>
         <View style={styles.text1}>
           <View style={styles.like}>
-            <Text style={{ fontSize: 15 }}>
-              {props.data.likes}
-            </Text>
+            <Text style={{ fontSize: 15 }}>{props.data.likes}</Text>
           </View>
           <View style={styles.likes}>
             <Text style={{ fontSize: 15 }}>
-              {(props.data.likes )- (props.data.dislikes)}
+              {props.data.likes - props.data.dislikes}
             </Text>
           </View>
           <View style={styles.dislikes}>
-            <Text style={{ fontSize: 15 }}>
-              {props.data.dislikes}
-            </Text>
+            <Text style={{ fontSize: 15 }}>{props.data.dislikes}</Text>
           </View>
         </View>
         <View style={styles.more}>
           <TouchableOpacity
             style={styles.more1}
-            onPress={() => {setdislike(false)
-              setlike(false)
+            onPress={() => {
+              setdislike(false);
+              setlike(false);
               if (disliked) {
                 fetchLike("undislike");
-              } else if(liked){
+              } else if (liked) {
                 fetchLike("dislike");
                 fetchLike("unlike");
-              }else{
+              } else {
                 fetchLike("dislike");
               }
             }}

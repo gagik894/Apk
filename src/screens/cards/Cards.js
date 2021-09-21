@@ -40,7 +40,16 @@ export default class Cards extends React.Component {
       refreshData()
     });
   };
+  constructor(props) {
+    super(props);
+    this.handler = this.handler.bind(this);
+    this.Push = this.Push.bind(this);
+  }
 
+  handler(props) {
+    alert(props.id)
+    this.props.navigation.navigate("Users", {data: props.id})
+  }
   refreshData = async () => {
     try {  
       const token = await AsyncStorage.getItem("token");
@@ -57,6 +66,7 @@ export default class Cards extends React.Component {
       const apidata = await fetchedData.json();
       apidata.data.map((i,index) =>{
         i.user = apidata.User
+        i.handler=this.handler
       })
       this.setState({ data: apidata.data});
     } catch (error) {
@@ -81,6 +91,7 @@ export default class Cards extends React.Component {
       const apidata = await fetchedData.json();
       apidata.data.map((i,index) =>{
         i.user = apidata.User
+        i.handler=this.handler
       })
       this.setState({ data: apidata.data, loading: false });
     } catch (error) {
@@ -88,10 +99,6 @@ export default class Cards extends React.Component {
       console.log(error);
     }
   };
-  constructor(props) {
-    super(props);
-    this.Push = this.Push.bind(this);
-  }
   async componentDidMount() {
     await this.fetchData();
     this.Push()
@@ -160,7 +167,8 @@ export default class Cards extends React.Component {
             }
             data={this.state.data.slice(0).reverse()}
             userData={this.state.user}
-            renderItem={renderItem}
+            handler={this.handler}
+            renderItem={renderItem}            
             keyExtractor={(item, index) => item._id}
           />
         )}

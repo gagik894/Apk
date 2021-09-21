@@ -29,22 +29,24 @@ export default class Users extends React.Component {
     error: false,
     page: 1,
     visible: false,
+    followings: 0,
+    followers: 0,
   };
   Push = () => {
     const pusher = new Pusher("111c634f224bfb055def", {
       cluster: "ap2",
     });
 
-    const refreshData = async()=>{
+    const refreshData = async () => {
       await this.refreshData();
-    }
+    };
     const channel = pusher.subscribe("posts");
     channel.bind("update", function (data) {
-      refreshData()
+      refreshData();
     });
     const channel1 = pusher.subscribe("users");
     channel1.bind("update", function (data) {
-      refreshData()
+      refreshData();
     });
   };
   constructor(props) {
@@ -58,7 +60,7 @@ export default class Users extends React.Component {
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
-        "https://backapi.herokuapp.com/posts/profile",
+        "https://backapi.herokuapp.com/posts/profile/my",
         {
           method: "GET",
           headers: {
@@ -67,7 +69,7 @@ export default class Users extends React.Component {
         }
       );
       const fetchedProfileData = await fetch(
-        "https://backapi.herokuapp.com/auth/profile",
+        "https://backapi.herokuapp.com/auth/profile/my",
         {
           method: "GET",
           headers: {
@@ -80,9 +82,15 @@ export default class Users extends React.Component {
       apidata.data.map((i, index) => {
         i.user = apidata.User;
       });
-      this.setState({ data: apidata.data, visible: false, profileData: profiledata });
+      this.setState({
+        data: apidata.data,
+        visible: false,
+        profileData: profiledata,
+        followings: profiledata.followings.length,
+        followers: profiledata.followers.length,
+      });
     } catch (error) {
-      this.setState({ error: true});
+      this.setState({ error: true });
       console.log("error", error);
     }
   };
@@ -91,7 +99,7 @@ export default class Users extends React.Component {
       const token = await AsyncStorage.getItem("token");
       this.setState({ loading: true });
       const fetchedData = await fetch(
-        "https://backapi.herokuapp.com/posts/profile",
+        "https://backapi.herokuapp.com/posts/profile/my",
         {
           method: "GET",
           headers: {
@@ -113,7 +121,7 @@ export default class Users extends React.Component {
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedProfileData = await fetch(
-        "https://backapi.herokuapp.com/auth/profile",
+        "https://backapi.herokuapp.com/auth/profile/my",
         {
           method: "GET",
           headers: {
@@ -122,7 +130,12 @@ export default class Users extends React.Component {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      this.setState({ profileData: profiledata });
+      console.log(profiledata.followings.length);
+      this.setState({
+        profileData: profiledata,
+        followings: profiledata.followings.length,
+        followers: profiledata.followers.length,
+      });
     } catch (error) {
       this.setState({ error: true, loading: false, visible: false });
       console.log("error", error);
@@ -160,7 +173,7 @@ export default class Users extends React.Component {
   componentDidMount() {
     this.fetchProfile();
     this.fetchData();
-    this.Push()
+    this.Push();
   }
   async _onRefresh() {
     this.setState({ refreshing: true });
@@ -203,7 +216,12 @@ export default class Users extends React.Component {
           >
             <View>
               <View style={styles.card}>
-                <TouchableOpacity onPress={()=> this.props.navigation.navigate("Add", {data: "cover"})} style={styles.coverimg}>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.props.navigation.navigate("Add", { data: "cover" })
+                  }
+                  style={styles.coverimg}
+                >
                   <ImageBackground
                     source={{
                       uri: `https://drive.google.com/uc?export=wiew&id=${this.state.profileData.coverImgUrl}`,
@@ -216,7 +234,14 @@ export default class Users extends React.Component {
                       paddingTop: height / 2,
                     }}
                   >
-                    <TouchableOpacity onPress={()=> this.props.navigation.navigate("Add", {data: "avatar"})} style={{ height: 148, width: 148, marginLeft: 5 }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.props.navigation.navigate("Add", {
+                          data: "avatar",
+                        })
+                      }
+                      style={{ height: 148, width: 148, marginLeft: 5 }}
+                    >
                       <Image
                         style={{
                           height: "100%",
@@ -252,7 +277,7 @@ export default class Users extends React.Component {
                         color: "blue",
                       }}
                     >
-                      55
+                      {this.state.followers}
                     </Text>
                     <Text style={{ textAlign: "center" }}>Followers</Text>
                   </TouchableOpacity>
@@ -267,7 +292,7 @@ export default class Users extends React.Component {
                         color: "blue",
                       }}
                     >
-                      15
+                      {this.state.followings}
                     </Text>
                     <Text style={{ textAlign: "center" }}>Followings</Text>
                   </TouchableOpacity>
@@ -314,7 +339,9 @@ export default class Users extends React.Component {
                 style={styles.bottomNavigationViewButton}
                 onPress={() => this.fetchDelete()}
               >
-                <Text style={{ fontSize: 18, color: "red" }}>Delete Account</Text>
+                <Text style={{ fontSize: 18, color: "red" }}>
+                  Delete Account
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -323,10 +350,10 @@ export default class Users extends React.Component {
     );
   }
 }
-const width = (Dimensions.get("window").width) * 0.96
-const height = 0.5*width;
-const cardHeight = height + 100
-console.log(width, height)
+const width = Dimensions.get("window").width * 0.96;
+const height = 0.5 * width;
+const cardHeight = height + 100;
+console.log(width, height);
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#EAEDED",

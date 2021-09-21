@@ -30,8 +30,8 @@ export default function ImagePickerExample(props) {
       });
       const token = await AsyncStorage.getItem("token");
       const fetchedProfileData = await fetch(
-        `http://localhost:3333/posts/add/${picType}`,
-        // `https://backapi.herokuapp.com/posts/add/${picType}`,
+        // `http://localhost:3333/posts/add/${picType}`,
+        `https://backapi.herokuapp.com/posts/add/${picType}`,
         {
           method: "Post",
           headers: {

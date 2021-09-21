@@ -17,32 +17,12 @@ const renderItem = ({ item }) => {
   return <MiniCard data={item} />;
 };
 
-function Header() {
-  const [search, searchval] = useState("");
-  return (
-    <View style={styles.container0}>
-      <View style={styles.header}>
-        <View style={styles.text}>
-          <FontAwesome name="search" color="#05375a" size={25} />
-          <TextInput
-            placeholder="Shearch"
-            onChangeText={(val) => {
-              searchval(val);
-            }}
-            style={{
-              marginHorizontal: 10,
-              alignSelf: "flex-end",
-              borderColor: "black",
-              width: "85%",
-              height: "100%",
-              fontSize: 15,
-            }}
-          />
-        </View>
-      </View>
-    </View>
-  );
-}
+// function Header() {
+//   const [search, searchval] = useState("");
+//   return (
+    
+//   );
+// }
 
 export default class Search extends React.Component {
   state = {
@@ -51,6 +31,7 @@ export default class Search extends React.Component {
     error: false,
     page: 1,
     refreshing: false,
+    searchval: null,
   };
   Push = () => {
     const pusher = new Pusher("111c634f224bfb055def", {
@@ -116,7 +97,30 @@ export default class Search extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Header />
+        <View>
+      <View style={styles.header}>
+        <View style={styles.text}>
+          <FontAwesome name="search" color="#05375a" size={25} />
+          <TextInput
+            placeholder="Shearch"
+            value={this.state.searchval}
+            onChangeText={(val) => {
+              this.setState({
+                searchval: val
+              })
+            }}
+            style={{
+              marginHorizontal: 10,
+              alignSelf: "flex-end",
+              borderColor: "black",
+              width: "85%",
+              height: "100%",
+              fontSize: 15,
+            }}
+          />
+        </View>
+      </View>
+    </View>
         {this.state.loading ? (
           <ActivityIndicator size="large" color="black" />
         ) : (
