@@ -116,7 +116,6 @@ const SignIn = ({ navigation }) => {
           username: data.name.split(" ").join("_"),
           fullname: data.name,
           email: data.email || null,
-          avatar: data.picture.data.url,
         };
         signUpFetch(send);
       }

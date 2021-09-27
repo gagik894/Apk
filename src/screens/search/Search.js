@@ -46,6 +46,15 @@ export default class Search extends React.Component {
       refreshData()
     });
   };
+
+  constructor(props) {
+    super(props);
+    this.handler = this.handler.bind(this);
+    this.Push = this.Push.bind(this);
+  }
+  handler(props) {
+    this.props.navigation.navigate("Users", {data: props.id})
+  }
   refreshData = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -60,6 +69,10 @@ export default class Search extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
+      apidata.data.map((i,index) =>{
+        i.handler=this.handler;
+        i.user = apidata.User
+      })
       this.setState({ data: apidata.data });
     } catch (error) {
       this.setState({ error: true });
@@ -80,6 +93,10 @@ export default class Search extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
+      apidata.data.map((i,index) =>{
+        i.handler=this.handler
+        i.user = apidata.User
+      })
       this.setState({ data: apidata.data, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
@@ -109,6 +126,7 @@ export default class Search extends React.Component {
                 searchval: val
               })
             }}
+            onFocus={()=>{alert("soon")}}
             style={{
               marginHorizontal: 10,
               alignSelf: "flex-end",

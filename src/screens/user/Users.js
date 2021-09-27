@@ -83,8 +83,8 @@ export default class Users extends React.Component {
         visible: false,
         profileData: profiledata.data,
         followed: profiledata.followed,
-        followings: profiledata.followings.length,
-        followers: profiledata.followers.length,
+        followings: profiledata.data.followings.length,
+        followers: profiledata.data.followers.length,
       });
     } catch (error) {
       this.setState({ error: true });
@@ -117,7 +117,6 @@ export default class Users extends React.Component {
   };
   fetchProfile = async () => {
     try {
-      console.log(this.id);
       const token = await AsyncStorage.getItem("token");
       const fetchedProfileData = await fetch(
         `https://backapi.herokuapp.com/auth/profile/${this.id}`,
@@ -133,8 +132,8 @@ export default class Users extends React.Component {
       this.setState({
         profileData: profiledata.data,
         followed: profiledata.followed,
-        followings: profiledata.followings.length,
-        followers: profiledata.followers.length,
+        followings: profiledata.data.followings.length,
+        followers: profiledata.data.followers.length,
       });
     } catch (error) {
       this.setState({ error: true, loading: false, visible: false });
@@ -306,7 +305,7 @@ export default class Users extends React.Component {
                         color: "blue",
                       }}
                     >
-                      55
+                      {this.state.followers}
                     </Text>
                     <Text style={{ textAlign: "center" }}>Followers</Text>
                   </TouchableOpacity>
@@ -321,7 +320,7 @@ export default class Users extends React.Component {
                         color: "blue",
                       }}
                     >
-                      15
+                      {this.state.followings}
                     </Text>
                     <Text style={{ textAlign: "center" }}>Followings</Text>
                   </TouchableOpacity>

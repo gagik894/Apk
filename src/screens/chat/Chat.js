@@ -333,7 +333,6 @@ export default class Chat extends React.Component {
         loading: false,
       });
     } catch (error) {
-      alert(error)
       this.setState({ error: true, loading: false });
     }
   };

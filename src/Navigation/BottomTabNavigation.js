@@ -29,6 +29,7 @@ function UserNavigation(props) {
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="Change" component={Change} />
       <Stack.Screen name="Card" component={Card} />
+      <Stack.Screen name="Search" component={Search} />
       <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
     </Stack.Navigator>
   );

@@ -147,8 +147,8 @@ export default class Users extends React.Component {
       const token = await AsyncStorage.getItem("token");
       this.setState({ loading: true });
       const fetchedProfileData = await fetch(
-        // "http://localhost:3333/auth/remove",
-        "https://backapi.herokuapp.com/auth/remove",
+        "http://localhost:3333/auth/remove",
+        // "https://backapi.herokuapp.com/auth/remove",
         {
           method: "GET",
           headers: {

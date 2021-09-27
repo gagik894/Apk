@@ -47,7 +47,6 @@ export default class Cards extends React.Component {
   }
 
   handler(props) {
-    alert(props.id)
     this.props.navigation.navigate("Users", {data: props.id})
   }
   refreshData = async () => {
