@@ -10,7 +10,6 @@ import {
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function MiniCard(props) {
-  console.log(props, "pr");
   return (
     <View style={styles.card}>
       <TouchableOpacity

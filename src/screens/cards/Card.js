@@ -11,7 +11,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
 
 export default function Card(props) {
-  console.log(props)
   const [liked, setlike] = useState(false);
   const [disliked, setdislike] = useState(false);
   const [visible, setVisible] = useState(false);

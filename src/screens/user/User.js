@@ -130,7 +130,6 @@ export default class Users extends React.Component {
         }
       );
       const profiledata = await fetchedProfileData.json();
-      console.log(profiledata.followings.length);
       this.setState({
         profileData: profiledata,
         followings: profiledata.followings.length,
@@ -147,8 +146,8 @@ export default class Users extends React.Component {
       const token = await AsyncStorage.getItem("token");
       this.setState({ loading: true });
       const fetchedProfileData = await fetch(
-        "http://localhost:3333/auth/remove",
-        // "https://backapi.herokuapp.com/auth/remove",
+        // "http://localhost:3333/auth/remove",
+        "https://backapi.herokuapp.com/auth/remove",
         {
           method: "GET",
           headers: {
@@ -353,7 +352,6 @@ export default class Users extends React.Component {
 const width = Dimensions.get("window").width * 0.96;
 const height = 0.5 * width;
 const cardHeight = height + 100;
-console.log(width, height);
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#EAEDED",

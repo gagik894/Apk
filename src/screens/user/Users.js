@@ -352,7 +352,6 @@ export default class Users extends React.Component {
 const width = Dimensions.get("window").width * 0.96;
 const height = 0.5 * width;
 const cardHeight = height + 120;
-console.log(width, height);
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#EAEDED",
