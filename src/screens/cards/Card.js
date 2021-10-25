@@ -22,8 +22,8 @@ export default function Card(props) {
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedDelet = await fetch(
-        // `https://backapi.herokuapp.com/posts/post/${props.data._id}/delete`,
-        `http://localhost:3333/posts/post/${props.data._id}/delete`,
+        `https://backapi.herokuapp.com/posts/post/${props.data._id}/delete`,
+        // `http://localhost:3333/posts/post/${props.data._id}/delete`,
         {
           method: "delete",
           headers: {
@@ -44,8 +44,8 @@ export default function Card(props) {
     try {
       const token = await AsyncStorage.getItem("token");
       const fetchedLogin = await fetch(
-        // `https://backapi.herokuapp.com/posts/post/${props.data._id}/like`,
-        `http://localhost:3333/posts/post/${props.data._id}/like`,
+        `https://backapi.herokuapp.com/posts/post/${props.data._id}/like`,
+        // `http://localhost:3333/posts/post/${props.data._id}/like`,
         {
           method: "POST",
           headers: {
