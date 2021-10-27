@@ -227,7 +227,7 @@ const SignUp = ({ navigation }) => {
       }) => {
         return (
             <View style={styles.container}>
-              <StatusBar backgroundColor="#0095f6" barStyle="light-content" />
+
               <Animatable.View
                 animation="slideInDown"
                 style={{
@@ -539,7 +539,7 @@ const height = Math.round(Dimensions.get("window").height * 0.75 - 50);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0095f6",
+    backgroundColor: "#45b6ed",
   },
   error: {
     fontSize: 25,
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   signIn: {
-    backgroundColor: "#0095f6",
+    backgroundColor: "#45b6ed",
     width: "100%",
     height: 50,
     justifyContent: "center",

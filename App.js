@@ -64,7 +64,7 @@ export default function App() {
   getData();
   return (
     <SafeAreaView style={styles.container1}>
-      <StatusBar style="inverted" backgroundColor="black" />
+      <StatusBar backgroundColor="#45b6ed" barStyle="light-content" />
       {error ? (
         <Text>Something went Wrong</Text>
       ) : profile ? (

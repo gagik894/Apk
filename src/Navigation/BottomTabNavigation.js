@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Add from "../screens/add/Add";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Cards from "../screens/cards/Cards";
+import CardsD from "../screens/cards/CardsD";//
 import Card from "../screens/cards/Card";
 import User from "../screens/user/User";
 import Users from "../screens/user/Users";
@@ -38,7 +39,8 @@ function UserNavigation(props) {
 function Navigation() {
   return (
     <Stack.Navigator headerMode={"none"}>
-      <Stack.Screen name="Cards" component={Cards} />
+      {/* <Stack.Screen name="Cards" component={Cards} /> */}
+      <Stack.Screen name="Cards" component={CardsD} />
       <Stack.Screen name="Users" component={Users} />
       <Stack.Screen name="Add" component={Add} />
       <Stack.Screen name="Chat" component={ChatNavigation} />
@@ -59,7 +61,13 @@ const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator(route) {
   return (
-    <Tab.Navigator activeColor="#f0edf6" initialRouteName="Cards">
+    <Tab.Navigator initialRouteName="Cards" 
+    tabBarOptions={{
+          style: {
+                backgroundColor: '#eaeded',
+          }
+   }}
+    >
       <Tab.Screen
         options={{
           tabBarLabel: "",

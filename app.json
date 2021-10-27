@@ -13,6 +13,9 @@
       "image": "./assets/T.png",
       "backgroundColor": "#45b6ed"
     },
+    "androidNavigationBar": {
+      "backgroundColor": "#EAEDED"
+    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },

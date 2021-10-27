@@ -151,7 +151,6 @@ const SignIn = ({ navigation }) => {
       }) => {
         return (
           <View style={styles.container}>
-            <StatusBar backgroundColor="#45b6ed" barStyle="light-content" />
             <Animatable.View
               animation="slideInDown"
               style={

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
+import Pusher from "pusher-js/react-native";
 
 export default function Card(props) {
   const [liked, setlike] = useState(false);
@@ -60,6 +61,7 @@ export default function Card(props) {
       console.log(error);
     }
   }
+
   if (props.data.likedpeople.length != 0) {
     props.data.likedpeople.map((i, index) => {
       if (i == props.data.user && liked == false) {
@@ -67,32 +69,38 @@ export default function Card(props) {
         if (disliked == true) {
           setdislike(false);
         }
+      } else {
+        mapDisLikes();
       }
     });
   } else if (liked == true) {
-    setlike(false);
+    setlike(false)
+    mapDisLikes();
   }
-  if (props.data.dislikedpeople.length != 0) {
-    props.data.dislikedpeople.map((i, index) => {
-      if (i == props.data.user && disliked == false) {
-        setdislike(true);
-        if (liked == true) {
-          setlike(false);
+  function mapDisLikes() {
+    if (props.data.dislikedpeople.length != 0) {
+      props.data.dislikedpeople.map((i, index) => {
+        if (i == props.data.user && disliked == false) {
+          setdislike(true);
+          if (liked == true) {
+            setlike(false);
+          }
         }
-      }
-    });
-  } else if (disliked == true) {
-    setdislike(false);
+      });
+    } else if (disliked == true) {
+      setdislike(false);
+    }
   }
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.profile}>
           <TouchableOpacity
-            disabled={(props.data.user == props.data.userId._id)}
+            disabled={props.data.user == props.data.userId._id}
             onPress={() => {
               props.data.handler({
-                id: props.data.userId._id
+                id: props.data.userId._id,
               });
             }}
           >
@@ -111,15 +119,15 @@ export default function Card(props) {
           </TouchableOpacity>
         </View>
         <View style={styles.text}>
-        <TouchableOpacity
-            disabled={(props.data.user == props.data.userId._id)}
+          <TouchableOpacity
+            disabled={props.data.user == props.data.userId._id}
             onPress={() => {
               props.data.handler({
-                id: props.data.userId._id
+                id: props.data.userId._id,
               });
             }}
           >
-          <Text style={{ fontSize: 15 }}>{props.data.userId.username}</Text>
+            <Text style={{ fontSize: 15 }}>{props.data.userId.username}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.more}>
