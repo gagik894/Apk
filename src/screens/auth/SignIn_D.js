@@ -17,7 +17,7 @@ import {
   Dimensions,
   ActivityIndicator,
   Image,
-  BackHandler
+  BackHandler,Alert
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -31,6 +31,7 @@ const SignIn = ({ navigation }) => {
   const backAction = () => {
     BackHandler.exitApp()
   };
+
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
     Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
@@ -162,7 +163,7 @@ const SignIn = ({ navigation }) => {
                 keyboardstatus
                   ? {
                       justifyContent: "center",
-                      backgroundColor: "#fff",
+                      backgroundColor: "#000",
                       paddingTop: 15,
                       borderTopLeftRadius: 30,
                       borderTopRightRadius: 30,
@@ -179,7 +180,7 @@ const SignIn = ({ navigation }) => {
                 <Text style={styles.error}>{error}</Text>
               ) : keyboardstatus ? (
                 <Image
-                  source={require("../../../assets/img/T.png")}
+                  source={require("../../../assets/img/T_D.png")}
                   style={{
                     width: 125,
                     height: 125,
@@ -189,7 +190,7 @@ const SignIn = ({ navigation }) => {
                 ></Image>
               ) : (
                 <Image
-                  source={require("../../../assets/T.png")}
+                  source={require("../../../assets/T_D.png")}
                   style={{
                     width: 150,
                     height: 150,
@@ -205,11 +206,11 @@ const SignIn = ({ navigation }) => {
                 keyboardstatus
                   ? {
                       flex: 1,
-                      backgroundColor: "#fff",
+                      backgroundColor: "#000",
                     }
                   : {
                       flex: 3,
-                      backgroundColor: "#fff",
+                      backgroundColor: "#000",
                       borderTopLeftRadius: 30,
                       borderTopRightRadius: 30,
                     }
@@ -233,9 +234,10 @@ const SignIn = ({ navigation }) => {
                         onChangeText={handleChange("email")}
                         onBlur={handleBlur("email")}
                         placeholder="Email or userrname"
-                        placeholderTextColor="#666666"
+                        placeholderTextColor="#fff"
                         style={styles.textInput}
                         value={values.email}
+                        color="#fff"
                       />
                     </View>
                     <Error touch={touched.email} error={errors.email} />
@@ -248,16 +250,17 @@ const SignIn = ({ navigation }) => {
                         onChangeText={handleChange("password")}
                         onBlur={handleBlur("password")}
                         placeholder="Password"
-                        placeholderTextColor="#666666"
+                        placeholderTextColor="#fff"
                         style={styles.textInput}
                         value={values.password}
                         secureTextEntry={hiden ? true : false}
+                        color="#fff"
                       />
                       <TouchableOpacity onPress={() => sethiden(!hiden)}>
                         {hiden ? (
-                          <FontAwesome name="lock" size={20} />
+                          <FontAwesome name="lock" color="white" size={20} />
                         ) : (
-                          <FontAwesome name="unlock" size={20} />
+                          <FontAwesome name="unlock" color="white" size={20} />
                         )}
                       </TouchableOpacity>
                     </View>
@@ -289,7 +292,7 @@ const SignIn = ({ navigation }) => {
                       <Text
                         style={[
                           {
-                            color: "#666666",
+                            color: "#fff",
                             fontSize: 12,
                           },
                         ]}
@@ -342,7 +345,7 @@ const SignIn = ({ navigation }) => {
                   <Text
                     style={[
                       {
-                        color: "#666666",
+                        color: "white",
                       },
                     ]}
                   >
@@ -380,7 +383,7 @@ const height = Math.round(Dimensions.get("window").height * 0.75 - 50);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#45b6ed",
+    backgroundColor: "#202020",
   },
   error: {
     fontSize: 25,
@@ -409,7 +412,8 @@ const styles = StyleSheet.create({
     height: 50,
     flexDirection: "row",
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "#202020",
+    backgroundColor: "#202020",
     paddingBottom: 5,
     justifyContent: "space-between",
     paddingRight: 10,
@@ -427,12 +431,12 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   signIn: {
-    backgroundColor: "#45b6ed",
     width: "100%",
     height: 50,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
+    backgroundColor: "#45b6ed"
   },
   fbsignIn: {
     backgroundColor: "#47639c",
@@ -446,7 +450,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: "black",
+    borderTopColor: "white",
     height: 50,
   },
   textSign: {

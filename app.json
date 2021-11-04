@@ -14,7 +14,7 @@
       "backgroundColor": "#45b6ed"
     },
     "androidNavigationBar": {
-      "backgroundColor": "#EAEDED"
+      "backgroundColor": "#202020"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

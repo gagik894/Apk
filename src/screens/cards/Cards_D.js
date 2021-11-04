@@ -11,11 +11,12 @@ import {
   FlatList,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Card from "./Card";
+
+import Card_D from "./Card_D";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Pusher from "pusher-js/react-native";
 const renderItem = ({ item }) => {
-  return <Card data={item} />;
+  return <Card_D data={item} />;
 };
 export default class Cards extends React.Component {
   state = {
@@ -116,7 +117,7 @@ export default class Cards extends React.Component {
               onPress={() => this.props.navigation.navigate("Add", {data: "post"})}
             >
               <Image
-                source={require("../../../assets/img/camera.png")}
+                source={require("../../../assets/img/camera_D.png")}
                 style={{ width: 40, height: 40, marginHorizontal: 5 }}
               />
             </TouchableOpacity>
@@ -127,6 +128,7 @@ export default class Cards extends React.Component {
                 {
                   fontSize: 20,
                   alignSelf: "center",
+                  color: "white"
                 },
               ]}
             >
@@ -138,7 +140,7 @@ export default class Cards extends React.Component {
               onPress={() => this.props.navigation.navigate("Chat")}
             >
               <Image
-                source={require("../../../assets/img/send.png")}
+                source={require("../../../assets/img/send_D.png")}
                 style={{
                   width: 40,
                   height: 40,
@@ -185,7 +187,7 @@ const height = Math.round(Dimensions.get("window").height);
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#EAEDED",
+    backgroundColor: "#000000",
     flex: 1,
     width: "100%",
   },
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "black",
     alignItems: "center",
     height: 50,
-    backgroundColor: "#ffff",
+    backgroundColor: "#202020",
   },
   header: {
     height: 52,
