@@ -6,6 +6,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  Share,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
@@ -91,7 +92,24 @@ export default function Card(props) {
       setdislike(false);
     }
   }
-
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `https://drive.google.com/uc?export=wiew&id=${props.data.imgId}`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -259,7 +277,7 @@ export default function Card(props) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.bottomNavigationViewButton}
-              onPress={() => alert("soon")}
+              onPress={() => onShare()}
             >
               <Text style={{ fontSize: 18 }}>Share</Text>
             </TouchableOpacity>

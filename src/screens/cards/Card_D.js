@@ -6,6 +6,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  Share,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
@@ -62,36 +63,70 @@ export default function Card(props) {
     }
   }
 
-  if (props.data.likedpeople.length != 0) {
-    props.data.likedpeople.map((i, index) => {
-      if (i == props.data.user && liked == false) {
-        setlike(true);
-        if (disliked == true) {
-          setdislike(false);
+  async function mapLikes() {
+    if (props.data.likedpeople.length != 0) {
+      let x = false;
+      await props.data.likedpeople.map((i, index) => {
+        if (i == props.data.user) {
+          x = true;
+          if (liked == false) {
+            setlike(true);
+            if (disliked == true) {
+              setdislike(false);
+            }
+          }
+        } else {
+          mapDisLikes();
         }
-      } else {
-        mapDisLikes();
+      });
+      if (x == false && liked == true) {
+        setlike(false);
       }
-    });
-  } else if (liked == true) {
-    setlike(false)
-    mapDisLikes();
+    } else if (liked == true) {
+      setlike(false);
+      mapDisLikes();
+    }
   }
-  function mapDisLikes() {
+  mapLikes();
+  async function mapDisLikes() {
+    let x = false;
     if (props.data.dislikedpeople.length != 0) {
-      props.data.dislikedpeople.map((i, index) => {
-        if (i == props.data.user && disliked == false) {
-          setdislike(true);
-          if (liked == true) {
-            setlike(false);
+      await props.data.dislikedpeople.map((i, index) => {
+        if (i == props.data.user) {
+          x = true;
+          if (disliked == false) {
+            setdislike(true);
+            if (liked == true) {
+              setlike(false);
+            }
           }
         }
       });
+      if (x == false && liked == true) {
+        setlike(false);
+      }
     } else if (disliked == true) {
       setdislike(false);
     }
   }
-
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `https://drive.google.com/uc?export=wiew&id=${props.data.imgId}`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -111,7 +146,7 @@ export default function Card(props) {
               style={{
                 width: "85%",
                 height: "85%",
-                borderRadius:10,
+                borderRadius: 10,
                 alignSelf: "center",
                 backgroundColor: "#eaeded",
               }}
@@ -127,7 +162,9 @@ export default function Card(props) {
               });
             }}
           >
-            <Text style={{ fontSize: 15,color: "#ffff" }}>{props.data.userId.username}</Text>
+            <Text style={{ fontSize: 15, color: "#ffff" }}>
+              {props.data.userId.username}
+            </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.more}>
@@ -152,8 +189,6 @@ export default function Card(props) {
           <TouchableOpacity
             style={styles.more1}
             onPress={() => {
-              setdislike(false);
-              setlike(false);
               if (liked) {
                 fetchLike("unlike");
               } else if (disliked) {
@@ -179,23 +214,25 @@ export default function Card(props) {
         </View>
         <View style={styles.text1}>
           <View style={styles.like}>
-            <Text style={{ fontSize: 15,color: "#ffff" }}>{props.data.likes}</Text>
+            <Text style={{ fontSize: 15, color: "#ffff" }}>
+              {props.data.likes}
+            </Text>
           </View>
           <View style={styles.likes}>
-            <Text style={{ fontSize: 15,color: "#ffff" }}>
+            <Text style={{ fontSize: 15, color: "#ffff" }}>
               {props.data.likes - props.data.dislikes}
             </Text>
           </View>
           <View style={styles.dislikes}>
-            <Text style={{ fontSize: 15,color: "#ffff" }}>{props.data.dislikes}</Text>
+            <Text style={{ fontSize: 15, color: "#ffff" }}>
+              {props.data.dislikes}
+            </Text>
           </View>
         </View>
         <View style={styles.more}>
           <TouchableOpacity
             style={styles.more1}
             onPress={() => {
-              setdislike(false);
-              setlike(false);
               if (disliked) {
                 fetchLike("undislike");
               } else if (liked) {
@@ -222,7 +259,9 @@ export default function Card(props) {
       </View>
       <View style={styles.bottom}>
         <Text style={{ fontSize: 11 }}>{props.data.desc}</Text>
-        <Text style={{ fontSize: 11,color: "#ffff" }}>{props.data.date.substring(0, 10)}</Text>
+        <Text style={{ fontSize: 11, color: "#ffff" }}>
+          {props.data.date.substring(0, 10)}
+        </Text>
       </View>
       <BottomSheet
         visible={visible}
@@ -251,7 +290,7 @@ export default function Card(props) {
                 style={
                   props.data.user == props.data.userId._id
                     ? { fontSize: 18, color: "red" }
-                    : { fontSize: 18, color: "#c7c7c7" }
+                    : { fontSize: 18, color: "#000" }
                 }
               >
                 Delete
@@ -259,15 +298,15 @@ export default function Card(props) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.bottomNavigationViewButton}
-              onPress={() => alert("soon")}
+              onPress={() => onShare()}
             >
-              <Text style={{ fontSize: 18 }}>Share</Text>
+              <Text style={{ fontSize: 18, color: "#fff" }}>Share</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.bottomNavigationViewButton}
               onPress={() => toggleBottomNavigationView()}
             >
-              <Text style={{ fontSize: 18 }}>Cancel</Text>
+              <Text style={{ fontSize: 18, color: "#fff" }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

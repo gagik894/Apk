@@ -78,6 +78,7 @@ export default function App() {
       ) : (
         colorScheme == 'dark'? <Navigation_D /> : <Navigation/>
       )}
+      {/* <Test/> */}
     </SafeAreaView>
   );
 }

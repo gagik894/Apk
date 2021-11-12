@@ -30,7 +30,10 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "Together.apk"
+      "package": "Together.apk",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3477096567321367~3300394335"
+      }
     }
   }
 }

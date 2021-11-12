@@ -152,7 +152,7 @@ const SignUp = ({ navigation }) => {
     ? (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30")
+          .max(40, "Must be shorter than 40")
           .required("required"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string(),
@@ -163,7 +163,7 @@ const SignUp = ({ navigation }) => {
     ? (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30"),
+          .max(40, "Must be shorter than 40"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string().required("required"),
         username: Yup.string(),
@@ -173,7 +173,7 @@ const SignUp = ({ navigation }) => {
     ? (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30"),
+          .max(40, "Must be shorter than 40"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string(),
         username: Yup.string().required("required"),
@@ -182,7 +182,7 @@ const SignUp = ({ navigation }) => {
     : (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30"),
+          .max(40, "Must be shorter than 40"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string(),
         username: Yup.string().required("required"),

@@ -35,7 +35,8 @@
     "react-native-keyboard-spacer": "^0.4.1",
     "react-native-screens": "~3.4.0",
     "react-native-web": "^0.17.1",
-    "yup": "^0.29.3"
+    "yup": "^0.29.3",
+    "expo-ads-admob": "~10.1.2"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

@@ -213,8 +213,14 @@ export default class Chat extends React.Component {
         );
         const data = await fetchedData.json();
 
+        let messages = []
+        await data.messageData.map((i, index) =>{
+          if(i.chat.length != 0){
+            messages.push(i)
+          }
+        })
         this.setState({
-          data: data.messageData,
+          data: messages,
           user: data.user,
         });
       } catch (error) {
@@ -293,9 +299,14 @@ export default class Chat extends React.Component {
         }
       );
       const data = await fetchedData.json();
-
+      let messages = []
+      await data.messageData.map((i, index) =>{
+        if(i.chat.length != 0){
+          messages.push(i)
+        }
+      })
       this.setState({
-        data: data.messageData,
+        data: messages,
         user: data.user,
         newData: null,
       });

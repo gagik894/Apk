@@ -514,7 +514,7 @@ export default class Chat extends React.Component {
                       paddingHorizontal: 10,
                       borderRadius: 30,
                       borderWidth: 2,
-                      borderColor: "#202020",
+                      borderColor: "#2a2a2a",
                       backgroundColor: "#202020",
                       width: "90%",
                       height: "100%",

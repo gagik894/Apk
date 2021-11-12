@@ -147,7 +147,7 @@ const SignUp = ({ navigation }) => {
     ? (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30")
+          .max(40, "Must be shorter than 40")
           .required("required"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string(),
@@ -158,7 +158,7 @@ const SignUp = ({ navigation }) => {
     ? (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30"),
+          .max(40, "Must be shorter than 40"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string().required("required"),
         username: Yup.string(),
@@ -168,7 +168,7 @@ const SignUp = ({ navigation }) => {
     ? (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30"),
+          .max(40, "Must be shorter than 40"),
         password: Yup.string().min(6, "Must be more than 6").required("required"),
         fullname: Yup.string(),
         username: Yup.string(),
@@ -177,7 +177,7 @@ const SignUp = ({ navigation }) => {
     : (validation = Yup.object().shape({
         email: Yup.string()
           .email("Must be a valid email ardess")
-          .max(30, "Must be shorter than 30"),
+          .max(40, "Must be shorter than 40"),
         password: Yup.string().min(6, "Must be more than 6"),
         fullname: Yup.string(),
         username: Yup.string(),
@@ -501,7 +501,7 @@ const height = Math.round(Dimensions.get("window").height * 0.75 - 50);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0095f6",
+    backgroundColor: "#45b6ed",
   },
   error: {
     fontSize: 25,
