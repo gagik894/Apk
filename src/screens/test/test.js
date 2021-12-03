@@ -1,84 +1,100 @@
-import {
-  AdMobBanner,
-  AdMobInterstitial,
-  AdMobRewarded,
-  PublisherBanner,
-} from 'expo-ads-admob'
-import React, { Component } from 'react'
-import { SafeAreaView, ScrollView } from 'react-native'
-import { Button, Text } from 'react-native'
-console.disableYellowBox = true
-const testID = 'cdcb341d-2e9d-4764-9988-3b51ae960f24';
-AdMobInterstitial.setAdUnitID("ca-app-pub-3477096567321367/7521042077")
-AdMobInterstitial.setTestDeviceID('EMULATOR')
-AdMobRewarded.setAdUnitID("ca-app-pub-3477096567321367/9383243496")
-AdMobRewarded.setTestDeviceID('EMULATOR')
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import React, { useState, useEffect, useRef } from 'react';
+import { Text, View, Button, Platform } from 'react-native';
 
-const productionID = 'my-id';
-// Is a real device and running in production.
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
-class Test extends Component {
-  state = {
-    disableInterstitialBtn: false,
-    disableRewardedBtn: false,
-  }
+export default function App() {
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
-  _openInterstitial = async () => {
-    try {
-      this.setState({ disableInterstitialBtn: true })
-      await AdMobInterstitial.requestAdAsync()
-      await AdMobInterstitial.showAdAsync()
-    } catch (error) {
-      console.error(error)
-    } finally {
-      this.setState({ disableInterstitialBtn: false })
-    }
-  }
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-  _openRewarded = async () => {
-    try {
-      this.setState({ disableRewardedBtn: true })
-      await AdMobRewarded.requestAdAsync()
-      await AdMobRewarded.showAdAsync()
-    } catch (error) {
-      console.error(error)
-    } finally {
-      this.setState({ disableRewardedBtn: false })
-    }
-  }
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
 
-  render() {
-    const { disableInterstitialBtn, disableRewardedBtn } = this.state
-    return (
-      <ScrollView>
-        <SafeAreaView style={{ margin: 20 }}>
-          <Text h2>GOOGLE ADMOB DEMO</Text>
-          <Text>
-            Set Ad Unit Id, Interstitial Id & Rewarded Id only on the top level
-            component once.
-          </Text>
-          <Text h4>Banner Ad</Text>
-          <AdMobBanner bannerSize="mediumRectangle" adUnitID={"ca-app-pub-3477096567321367/6748507148"} />
-          <Text h4>Publisher Banner</Text>
-          <PublisherBanner bannerSize="banner" adUnitID={"ca-app-pub-3477096567321367/6748507148"} />
-          <Text h4>Interstitial Ad</Text>
-          <Button
-            title="Open"
-            type="outline"
-            disabled={disableInterstitialBtn}
-            onPress={this._openInterstitial}
-          />
-          <Text h4>Rewarded Ad</Text>
-          <Button
-            title="Open"
-            type="outline"
-            disabled={disableRewardedBtn}
-            onPress={this._openRewarded}
-          />
-        </SafeAreaView>
-      </ScrollView>
-    )
-  }
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-around',
+      }}>
+      <Text>Your expo push token: {expoPushToken}</Text>
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Title: {notification && notification.request.content.title} </Text>
+        <Text>Body: {notification && notification.request.content.body}</Text>
+        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
+      </View>
+      <Button
+        title="Press to schedule a notification"
+        onPress={async () => {
+          await schedulePushNotification();
+        }}
+      />
+    </View>
+  );
 }
 
-export default Test
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: 'Here is the notification body',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
+  });
+}
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  return token;
+}

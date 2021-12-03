@@ -473,8 +473,20 @@ export default class Chat extends React.Component {
                   />
                 }
               >
-                {this.state.data == [] ? (
-                  <Text>Wow such empty</Text>
+               {this.state.data.length == 0?(
+                  
+                  <Text
+                  style={[
+                    {
+                      fontSize: 15,
+                      alignSelf: "center",
+                      color: "#000",
+                      marginTop: "80%"
+                    },
+                  ]}
+                >
+                  Wow such empty!
+                </Text>
                 ) : (
                   this.state.data
                     .slice(0)
