@@ -41,6 +41,7 @@
     },
     "android": {
       "package": "Together.apk",
+      "googleServicesFile": "./google-services.json",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-3477096567321367~3300394335"
       }

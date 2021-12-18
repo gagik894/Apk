@@ -21,7 +21,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import * as SecureStore from "expo-secure-store";
 const SignIn = ({ navigation }) => {
   const [error, seterror] = React.useState("");
   const [keyboardstatus, setkeyboardstatus] = React.useState(false);
@@ -54,6 +54,8 @@ const SignIn = ({ navigation }) => {
 
   const signUpFetch = async (value) => {
     setloading(true);
+    let pushToken = await SecureStore.getItemAsync("pushToken");
+    value.pushToken=pushToken;
     try {
       const fetchedSignUp = await fetch(
         // "http://localhost:3333/auth/fbsignup",
@@ -81,9 +83,12 @@ const SignIn = ({ navigation }) => {
   };
   const signInFetch = async (value) => {
     setloading(true);
+    let pushToken = await SecureStore.getItemAsync("pushToken");
+    value.pushToken=pushToken;
     try {
       const fetchedSignIn = await fetch(
         "https://backapi.herokuapp.com/auth/signin",
+        // "http://localhost:3333/auth/signin",
         {
           method: "POST",
           headers: {
