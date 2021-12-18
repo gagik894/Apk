@@ -87,6 +87,8 @@ const SignUp = ({ navigation }) => {
   };
   const signUpFetch = async (value) => {
     setloading(true);
+    let pushToken = await SecureStore.getItemAsync("pushToken");
+    value.pushToken=pushToken;
     try {
       const fetchSignUp = await fetch(
         // "http://localhost:3333/auth/signup",
