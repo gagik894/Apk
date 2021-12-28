@@ -1,14 +1,15 @@
 {
   "expo": {
     "userInterfaceStyle": "automatic",
+    
     "facebookScheme": "fb804105460333300",
     "facebookAppId": "804105460333300",
     "facebookDisplayName": "Together",
     "name": "Together",
     "slug": "Together",
-    "version": "1.0.0",
+    "version": "1.0.4",
     "orientation": "portrait",
-    "icon": "./assets/img/T.png",
+    "icon": "./assets/img/icon.png",
     "splash": {
       "image": "./assets/T.png",
       "backgroundColor": "#45b6ed"
@@ -17,8 +18,8 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/img/T.png",
-          "color": "#00000",
+          "icon": "./assets/img/Nottification.png",
+          "color": "#ffffff",
           "mode": "production"
         }
       ]
@@ -40,7 +41,12 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "Together.apk",
+      "adaptiveIcon":{
+        "foregroundImage": "./assets/img/adaptive-icon.png",
+        "backgroundColor": "#45b6ed"
+      },
+      "userInterfaceStyle": "automatic",
+      "package": "com.together.Together",
       "googleServicesFile": "./google-services.json",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-3477096567321367~3300394335"

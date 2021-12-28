@@ -63,31 +63,52 @@ export default function Card(props) {
     }
   }
 
-  if (props.data.likedpeople.length != 0) {
-    props.data.likedpeople.map((i, index) => {
-      if (i == props.data.user && liked == false) {
-        setlike(true);
-        if (disliked == true) {
-          setdislike(false);
+  async function mapLikes() {
+    if (props.data.likedpeople.length != 0) {
+      let x = false;
+      await props.data.likedpeople.map((i, index) => {
+        if (i == props.data.user) {
+          x = true;
+          if (liked == false) {
+            setlike(true);
+            if (disliked == true) {
+              setdislike(false);
+            }
+          }
+        } else {
+          mapDisLikes();
         }
-      } else {
-        mapDisLikes();
+      });
+      if (x == false && liked == true) {
+        setlike(false);
       }
-    });
-  } else if (liked == true) {
-    setlike(false)
-    mapDisLikes();
+    } else if (liked == true) {
+      setlike(false);
+      
+    }
   }
-  function mapDisLikes() {
+  mapLikes();
+  mapDisLikes();
+  async function mapDisLikes() {
+    console.log("tr");
+    let x = false;
     if (props.data.dislikedpeople.length != 0) {
-      props.data.dislikedpeople.map((i, index) => {
-        if (i == props.data.user && disliked == false) {
-          setdislike(true);
-          if (liked == true) {
-            setlike(false);
+      await props.data.dislikedpeople.map((i, index) => {
+        console.log(i, props.data.user)
+        if (i == props.data.user) {
+          x = true;
+          if (disliked == false) {
+            setdislike(true);
+            if (liked == true) {
+              setlike(false);
+            }
           }
         }
       });
+      console.log(x)
+      if (x == false && liked == true) {
+        setlike(false);
+      }
     } else if (disliked == true) {
       setdislike(false);
     }
@@ -170,8 +191,6 @@ export default function Card(props) {
           <TouchableOpacity
             style={styles.more1}
             onPress={() => {
-              setdislike(false);
-              setlike(false);
               if (liked) {
                 fetchLike("unlike");
               } else if (disliked) {
@@ -212,8 +231,6 @@ export default function Card(props) {
           <TouchableOpacity
             style={styles.more1}
             onPress={() => {
-              setdislike(false);
-              setlike(false);
               if (disliked) {
                 fetchLike("undislike");
               } else if (liked) {

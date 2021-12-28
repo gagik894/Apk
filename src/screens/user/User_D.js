@@ -166,6 +166,15 @@ export default class Users extends React.Component {
   };
 
   removeToken = async () => {
+    const removeToken = await fetch(
+      "https://backapi.herokuapp.com/auth/signout",
+      {
+        method: "GET",
+        headers: {
+          "auth-token": token,
+        },
+      }
+    );
     await AsyncStorage.removeItem("token");
   };
 
