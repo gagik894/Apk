@@ -166,16 +166,25 @@ export default class Users extends React.Component {
   };
 
   removeToken = async () => {
-    const removeToken = await fetch(
-      "https://backapi.herokuapp.com/auth/signout",
-      {
-        method: "GET",
-        headers: {
-          "auth-token": token,
-        },
-      }
-    );
-    await AsyncStorage.removeItem("token");
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const removeToken = await fetch(
+        "http://localhost:3333/auth/signout",
+        // "https://backapi.herokuapp.com/auth/signout",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const profiledata = await removeToken.json();
+      console.log(profiledata);
+      await AsyncStorage.removeItem("token");
+    } catch (error) {
+      this.setState({ error: true, loading: false });
+      console.log("error", error);
+    }
   };
 
   componentDidMount() {

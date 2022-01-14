@@ -119,7 +119,7 @@ export default class Search extends React.Component {
         <View style={styles.text}>
           <FontAwesome name="search" color="#05375a" size={25} />
           <TextInput
-            placeholder="Shearch"
+            placeholder="Search"
             value={this.state.searchval}
             onChangeText={(val) => {
               this.setState({

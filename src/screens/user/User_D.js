@@ -166,16 +166,25 @@ export default class Users extends React.Component {
   };
 
   removeToken = async () => {
-    const removeToken = await fetch(
-      "https://backapi.herokuapp.com/auth/signout",
-      {
-        method: "GET",
-        headers: {
-          "auth-token": token,
-        },
-      }
-    );
-    await AsyncStorage.removeItem("token");
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const removeToken = await fetch(
+        "http://localhost:3333/auth/signout",
+        // "https://backapi.herokuapp.com/auth/signout",
+        {
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        }
+      );
+      const profiledata = await removeToken.json();
+      console.log(profiledata);
+      await AsyncStorage.removeItem("token");
+    } catch (error) {
+      this.setState({ error: true, loading: false });
+      console.log("error", error);
+    }
   };
 
   componentDidMount() {
@@ -200,14 +209,14 @@ export default class Users extends React.Component {
                 this.props.navigation.navigate("SignIn", { data: "name" });
               }}
             >
-              <Text style={{ fontSize: 20,color: "#ffff" }}>
+              <Text style={{ fontSize: 20, color: "#ffff" }}>
                 {this.state.profileData.username}
               </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.text}>
             <TouchableOpacity onPress={() => this.toggleBottomNavigationView()}>
-              <Text style={{ fontSize: 15,color: "#ffff" }}>More</Text>
+              <Text style={{ fontSize: 15, color: "#ffff" }}>More</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -267,7 +276,8 @@ export default class Users extends React.Component {
                 <View style={styles.text1}>
                   <Text
                     style={{
-                      fontSize: 25,color: "#ffff"
+                      fontSize: 25,
+                      color: "#ffff",
                     }}
                   >
                     {this.state.profileData.fullname}
@@ -282,12 +292,14 @@ export default class Users extends React.Component {
                         textAlign: "center",
                         fontSize: 16,
                         fontWeight: "bold",
-                        color: "#ffff"
+                        color: "#ffff",
                       }}
                     >
                       {this.state.followers}
                     </Text>
-                    <Text style={{ textAlign: "center",color: "#ffff" }}>Followers</Text>
+                    <Text style={{ textAlign: "center", color: "#ffff" }}>
+                      Followers
+                    </Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.follows}>
@@ -297,12 +309,14 @@ export default class Users extends React.Component {
                         textAlign: "center",
                         fontSize: 16,
                         fontWeight: "bold",
-                        color: "#ffff"
+                        color: "#ffff",
                       }}
                     >
                       {this.state.followings}
                     </Text>
-                    <Text style={{ textAlign: "center",color: "#ffff" }}>Followings</Text>
+                    <Text style={{ textAlign: "center", color: "#ffff" }}>
+                      Followings
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>

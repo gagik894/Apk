@@ -68,17 +68,17 @@ export default function Card(props) {
       let x = false;
       await props.data.likedpeople.map((i, index) => {
         if (i == props.data.user) {
-          x = true;
-          if (liked == false) {
-            setlike(true);
-            if (disliked == true) {
-              setdislike(false);
-            }
-          }
-        } else {
-          mapDisLikes();
+          x = true; 
         }
       });
+      if(x == true){
+        if (liked == false) {
+          setlike(true);
+          if (disliked == true) {
+            setdislike(false);
+          }
+        }
+      }
       if (x == false && liked == true) {
         setlike(false);
       }
@@ -87,32 +87,31 @@ export default function Card(props) {
       
     }
   }
-  mapLikes();
-  mapDisLikes();
   async function mapDisLikes() {
-    console.log("tr");
     let x = false;
     if (props.data.dislikedpeople.length != 0) {
       await props.data.dislikedpeople.map((i, index) => {
-        console.log(i, props.data.user)
         if (i == props.data.user) {
           x = true;
-          if (disliked == false) {
-            setdislike(true);
-            if (liked == true) {
-              setlike(false);
-            }
-          }
+         
         }
       });
-      console.log(x)
-      if (x == false && liked == true) {
-        setlike(false);
+      if(x == true){
+        if (disliked == false) {
+          setdislike(true);
+          if (liked == true) {
+            setlike(false);
+          }
+        }
+      }else if (x == false && disliked == true) {
+        setdislike(false);
       }
     } else if (disliked == true) {
       setdislike(false);
     }
   }
+  mapLikes();
+  mapDisLikes();
   const onShare = async () => {
     try {
       const result = await Share.share({
