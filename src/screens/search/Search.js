@@ -102,6 +102,29 @@ export default class Search extends React.Component {
       this.setState({ error: true, loading: false });
     }
   };
+  fetchSearch = async (value) => {
+    try {
+      this.setState({ loading: true });
+      const token = await AsyncStorage.getItem("token");
+      const fetchedData = await fetch(
+        // "http://localhost:3333/auth/search",
+        "https://backapi.herokuapp.com/auth/search",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": token,
+          },
+          body: JSON.stringify({"search": value}),
+        }
+      );
+      const apidata = await fetchedData.json();
+      console.log(apidata)
+    } catch (error) {
+      this.setState({ error: true, loading: false });
+      alert(error)
+    }
+  };
   componentDidMount() {
     this.fetchData();
     this.Push()
@@ -120,13 +143,11 @@ export default class Search extends React.Component {
           <FontAwesome name="search" color="#05375a" size={25} />
           <TextInput
             placeholder="Search"
-            value={this.state.searchval}
+            // value={this.state.searchval}
             onChangeText={(val) => {
-              this.setState({
-                searchval: val
-              })
+              this.fetchSearch(val);
             }}
-            onFocus={()=>{alert("soon")}}
+            // onFocus={()=>{alert("soon")}}
             style={{
               marginHorizontal: 10,
               alignSelf: "flex-end",
