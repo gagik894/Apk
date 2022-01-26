@@ -17,8 +17,10 @@ const FormData = require("form-data");
 export default function ImagePickerExample(props) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const go =props.navigation.goBack
-  const picType = props.route.params.data;
+  const go = props.navigation.goBack;
+  let picType = props.route.params.data;
+  console.log(props.route.params.data);
+
   const fetchAdd = async (props) => {
     try {
       setLoading(true);
@@ -49,7 +51,36 @@ export default function ImagePickerExample(props) {
       console.log("erroor", error);
     }
   };
-
+  const fetchAddVideo = async (props) => {
+    try {
+      setLoading(true);
+      let formdata = new FormData();
+      formdata.append("video", {
+        uri: props,
+        name: "video.mp4",
+        type: "video/mp4",
+      });
+      const token = await AsyncStorage.getItem("token");
+      const fetchedProfileData = await fetch(
+        `http://localhost:3333/posts/new/video`,
+        // `https://backapi.herokuapp.com/posts/add/${picType}`,
+        {
+          method: "Post",
+          headers: {
+            "auth-token": token,
+            "Content-Type": "multipart/form-data",
+          },
+          body: formdata,
+        }
+      );
+      const profiledata = await fetchedProfileData.json();
+      setLoading(false);
+      go();
+    } catch (error) {
+      setLoading(false);
+      console.log("erroor", error);
+    }
+  };
   const openCamera = async () => {
     // Ask the user for the permission to access the camera
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -102,7 +133,7 @@ export default function ImagePickerExample(props) {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 0.9,
       });
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
@@ -118,10 +149,24 @@ export default function ImagePickerExample(props) {
     }
   };
 
+  const pickVideo = async () => {
+    let result;
+    result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.75,
+    });
+    if (!result.cancelled) {
+      fetchAddVideo(result.uri);
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <View style={styles.buttonContainer}>
         <Button color="#45b6ed" onPress={pickImage} title="Select an image" />
+        <Button color="#45b6ed" onPress={pickVideo} title="Select a video" />
         <Button color="#45b6ed" onPress={openCamera} title="Open camera" />
       </View>
       {/* <Button title="Pick an image from camera roll" onPress={pickImage} /> */}
@@ -138,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#202020"
+    backgroundColor: "#202020",
   },
   buttonContainer: {
     width: 400,

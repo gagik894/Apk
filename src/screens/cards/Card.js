@@ -11,11 +11,20 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheet } from "react-native-btr";
 import Pusher from "pusher-js/react-native";
+import { Video } from "expo-av";
+
+const width =
+    Math.round(Dimensions.get("window").width) < "600"
+      ? Math.round(Dimensions.get("window").width)
+      : Math.round(Dimensions.get("window").width) / 2 - 20;
+const height = Math.round(Dimensions.get("window").height);
+
 
 export default function Card(props) {
   const [liked, setlike] = useState(false);
   const [disliked, setdislike] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [videoHeight, setVideoHeight] = useState(width);
   const toggleBottomNavigationView = () => {
     //Toggling the visibility state of the bottom sheet
     setVisible(!visible);
@@ -177,13 +186,41 @@ export default function Card(props) {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.main}>
-        <Image
-          source={{
-            uri: `https://drive.google.com/uc?export=wiew&id=${props.data.imgId}`,
-          }}
-          style={{ width: "100%", height: "100%" }}
-        />
+      <View>
+        {props.data.type == "image" ? (
+          <View style={styles.main}>
+            <Image
+              source={{
+                uri: `https://drive.google.com/uc?export=wiew&id=${props.data.imgId}`,
+              }}
+              style={{ width: "100%", height: "100%" }}
+            />
+          </View>
+        ) : (
+          <View>
+            <Video
+              // ref={video}
+              source={{
+                uri: `https://drive.google.com/uc?export=view&id=${props.data.imgId}`,
+              }}
+                style={{
+                  width: width,
+                  height: videoHeight,
+              }}
+              useNativeControls
+              onReadyForDisplay={(response) => {
+                const newWidth= response.naturalSize.width;
+                const newHeight = response.naturalSize.height;
+                const heightScaled = newHeight * (width / newWidth);
+                setVideoHeight(heightScaled)
+              }}
+              resizeMode="contain"
+              isLooping
+              shouldPlay={true}
+              // onPlaybackStatusUpdate={true}
+            />
+          </View>
+        )}
       </View>
       <View style={styles.top}>
         <View style={styles.more}>
@@ -310,12 +347,6 @@ export default function Card(props) {
   );
 }
 
-const width =
-  Math.round(Dimensions.get("window").width) < "600"
-    ? Math.round(Dimensions.get("window").width)
-    : Math.round(Dimensions.get("window").width) / 2 - 20;
-
-const height = Math.round(Dimensions.get("window").height);
 
 const styles = StyleSheet.create({
   container1: {
