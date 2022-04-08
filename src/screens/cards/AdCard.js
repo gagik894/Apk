@@ -15,7 +15,6 @@ const width =
 const height = Math.round(Dimensions.get("window").height);
 
 export default function Card() {
-
   const inter = async () => {
     // await setTestDeviceIDAsync("EMULATOR");
     await AdMobInterstitial.setAdUnitID(
