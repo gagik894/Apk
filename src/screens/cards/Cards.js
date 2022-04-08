@@ -12,10 +12,16 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Card from "./Card";
+import AdCard from "./AdCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Pusher from "pusher-js/react-native";
 const renderItem = ({ item }) => {
-  return <Card data={item} />;
+  return (
+    <View>
+      <Card data={item} /> 
+      <AdCard/>
+    </View>
+  );
 };
 export default class Cards extends React.Component {
   state = {
@@ -32,12 +38,12 @@ export default class Cards extends React.Component {
       cluster: "ap2",
     });
 
-    const refreshData = async()=>{
+    const refreshData = async () => {
       await this.refreshData();
-    }
+    };
     const channel = pusher.subscribe("posts");
     channel.bind("update", function (data) {
-      refreshData()
+      refreshData();
     });
   };
   constructor(props) {
@@ -47,10 +53,10 @@ export default class Cards extends React.Component {
   }
 
   handler(props) {
-    this.props.navigation.navigate("Users", {data: props.id})
+    this.props.navigation.navigate("Users", { data: props.id });
   }
   refreshData = async () => {
-    try {  
+    try {
       const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
         // "http://localhost:3333/posts",
@@ -63,19 +69,19 @@ export default class Cards extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
-      apidata.data.map((i,index) =>{
-        i.user = apidata.User
-        i.handler=this.handler
-      })
-      this.setState({ data: apidata.data});
+      apidata.data.map((i, index) => {
+        i.user = apidata.User;
+        i.handler = this.handler;
+      });
+      this.setState({ data: apidata.data });
     } catch (error) {
-      this.setState({ error: true});
+      this.setState({ error: true });
       console.log(error);
     }
   };
   fetchData = async () => {
     try {
-        this.setState({ loading: true });    
+      this.setState({ loading: true });
       const token = await AsyncStorage.getItem("token");
       const fetchedData = await fetch(
         // "http://localhost:3333/posts",
@@ -88,10 +94,10 @@ export default class Cards extends React.Component {
         }
       );
       const apidata = await fetchedData.json();
-      apidata.data.map((i,index) =>{
-        i.user = apidata.User
-        i.handler=this.handler
-      })
+      apidata.data.map((i, index) => {
+        i.user = apidata.User;
+        i.handler = this.handler;
+      });
       this.setState({ data: apidata.data, loading: false });
     } catch (error) {
       this.setState({ error: true, loading: false });
@@ -100,11 +106,11 @@ export default class Cards extends React.Component {
   };
   async componentDidMount() {
     await this.fetchData();
-    this.Push()
+    this.Push();
   }
   async _onRefresh() {
     this.setState({ refreshing: true });
-    await this.refreshData()
+    await this.refreshData();
     this.setState({ refreshing: false });
   }
   render() {
@@ -113,7 +119,9 @@ export default class Cards extends React.Component {
         <View style={styles.mainheader}>
           <View style={styles.headerItems}>
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("Add", {data: "post"})}
+              onPress={() =>
+                this.props.navigation.navigate("Add", { data: "post" })
+              }
             >
               <Image
                 source={require("../../../assets/img/camera.png")}
@@ -167,7 +175,7 @@ export default class Cards extends React.Component {
             data={this.state.data.slice(0).reverse()}
             userData={this.state.user}
             handler={this.handler}
-            renderItem={renderItem}            
+            renderItem={renderItem}
             keyExtractor={(item, index) => item._id}
           />
         )}

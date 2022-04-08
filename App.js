@@ -12,7 +12,7 @@ import BottomTabNavigator from "./src/Navigation/BottomTabNavigation";
 import BottomTabNavigator_D from "./src/Navigation/BottomTabNavigation_D";
 import Navigation from "./src/Navigation/Navigation";
 import Navigation_D from "./src/Navigation/Navigation_D";
-import Test from "./src/screens/test/test";
+import Testik from "./src/screens/test/test";
 import { NavigationContainer } from "@react-navigation/native";
 import Add from "./src/screens/add/Add";
 import Change from "./src/screens/auth/Change";
@@ -93,7 +93,7 @@ export default function App() {
       ) : (
         <Navigation />
       )}
-      {/* <Test/> */}
+      {/* <Testik/> */}
     </SafeAreaView>
   );
 }

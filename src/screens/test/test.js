@@ -1,71 +1,67 @@
 import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { AdMobBanner, AdMobInterstitial, AdMobRewarded } from "expo";
-export default class App extends React.Component {
-  componentDidMount() {
-    // AdMobInterstitial.setTestDeviceID("EMULATOR");
-    // ALWAYS USE TEST ID for Admob ads
-    AdMobInterstitial.setAdUnitID("ca-app-pub3940256099942544/1033173712");
-    AdMobInterstitial.addEventListener("interstitialDidLoad", () =>
-      console.log("interstitialDidLoad")
-    );
-    AdMobInterstitial.addEventListener("interstitialDidFailToLoad", () =>
-      console.log("interstitialDidFailToLoad")
-    );
-    AdMobInterstitial.addEventListener("interstitialDidOpen", () =>
-      console.log("interstitialDidOpen")
-    );
-    AdMobInterstitial.addEventListener("interstitialDidClose", () =>
-      console.log("interstitialDidClose")
-    );
-    AdMobInterstitial.addEventListener("interstitialWillLeaveApplication", () =>
-      console.log("interstitialWillLeaveApplication")
-    );
-  }
-componentWillUnmount() {
-    AdMobInterstitial.removeAllListeners();
-  }
-bannerError() {
+import { StyleSheet, Text, View } from "react-native";
+import {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+  setTestDeviceIDAsync,
+} from "expo-ads-admob";
+
+export default class Testik extends React.Component {
+  bannerError() {
     console.log("An error");
     return;
   }
-showInterstitial() {
-    AdMobInterstitial.requestAd(() => AdMobInterstitial.showAd());
+  inter = async () => {
+    await AdMobInterstitial.setAdUnitID(
+      "ca-app-pub-3477096567321367/7521042077"
+    ); // Test ID, Replace with your-admob-unit-id
+    await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true });
+    await AdMobInterstitial.showAdAsync();
+  };
+  revarded = async () => {
+    await AdMobRewarded.setAdUnitID("ca-app-pub-3477096567321367/9383243496"); // Test ID, Replace with your-admob-unit-id
+    await AdMobRewarded.requestAdAsync();
+    await AdMobRewarded.showAdAsync();
+  };
+  async componentDidMount() {
+    await setTestDeviceIDAsync("EMULATOR");
+    await this.inter();
+    await this.revarded();
   }
-render() {
+  render() {
     return (
       <View style={styles.container}>
         <Text>Open up App.js to start working on your app!</Text>
-        <Button
-          title="Interstitial"
-          onPress={this.showInterstitial}
-          containerViewStyle={styles.interstitialBanner}
+        <PublisherBanner
+        //   style={{ width: "100%" }}
+          bannerSize="fullBanner"
+          adUnitID="ca-app-pub-3477096567321367/6748507148" // Test ID, Replace with your-admob-unit-id
+          onDidFailToReceiveAdWithError={this.bannerError}
+            onAdMobDispatchAppEvent={this.adMobEvent}
         />
         <AdMobBanner
-          style={styles.bottomBanner}
           bannerSize="fullBanner"
-          adUnitID="ca-app-pub-3940256099942544/6300978111"
-          // Test ID, Replace with your-admob-unit-id
-          testDeviceID="EMULATOR"
-          didFailToReceiveAdWithError={this.bannerError}
+          adUnitID="ca-app-pub-3477096567321367/6748507148" // Test ID, Replace with your-admob-unit-id
+          servePersonalizedAds // true or false
+          onDidFailToReceiveAdWithError={this.bannerError}
         />
       </View>
     );
   }
 }
+
 const styles = StyleSheet.create({
-  interstitialBanner: {
-    width: "100%",
-    marginLeft: 0
-  },
   bottomBanner: {
     position: "absolute",
-    bottom: 0
+    bottom: 0,
   },
   container: {
     flex: 1,
+    width: "100%",
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center"
-  }
+    justifyContent: "center",
+  },
 });

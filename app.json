@@ -1,13 +1,12 @@
 {
   "expo": {
     "userInterfaceStyle": "automatic",
-    
     "facebookScheme": "fb804105460333300",
     "facebookAppId": "804105460333300",
     "facebookDisplayName": "Together",
     "name": "Together",
     "slug": "Together",
-    "version": "1.0.5",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/img/icon.png",
     "splash": {
@@ -48,7 +47,7 @@
       "package": "com.together.Together",
       "googleServicesFile": "./google-services.json",
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-3477096567321367~3300394335"
+        "googleMobileAdsAppId": "ca-app-pub-3477096567321367~2432672784"
       }
     }
   }
